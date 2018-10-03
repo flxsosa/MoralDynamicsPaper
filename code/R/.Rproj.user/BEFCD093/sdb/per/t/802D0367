@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1502918301027.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "802D0367",
+    "lastKnownWriteTime" : 0,
+    "last_content_update" : 1502918301027,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "AEA9A304",
+        "caption" : "df.regression",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=df.regression&cache_key=AEA9A304",
+        "displayedObservations" : 11,
+        "environment" : "",
+        "object" : "df.regression",
+        "preview" : 0,
+        "totalObservations" : 11,
+        "variables" : 6
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

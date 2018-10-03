@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1503003674659.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "3DFD0612",
+    "lastKnownWriteTime" : 4321835264,
+    "last_content_update" : 1503003674659,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "A511D852",
+        "caption" : "df.long",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=df.long&cache_key=A511D852",
+        "displayedObservations" : "440",
+        "environment" : "",
+        "object" : "df.long",
+        "preview" : "0",
+        "totalObservations" : "440",
+        "variables" : "4"
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

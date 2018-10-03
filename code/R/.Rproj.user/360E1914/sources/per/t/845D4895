@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1536354212703.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "0|17|13|0|\n14|33|45|0|\n24|21|26|0|\n29|20|36|0|\n46|16|46|95|\n47|35|95|0|\n96|27|127|0|\n128|60|161|0|\n134|30|153|0|\n162|49|186|0|\n187|16|187|95|\n188|35|228|0|\n229|26|252|0|\n253|19|267|0|\n268|39|285|0|\n286|25|304|0|\n305|42|343|0|\n344|52|369|0|\n370|48|394|0|\n395|16|396|0|\n",
+    "hash" : "1762763615",
+    "id" : "845D4895",
+    "lastKnownWriteTime" : 1538610932,
+    "last_content_update" : 1538610943294,
+    "path" : "~/Desktop/moral_dynamics/code/R/as.R",
+    "project_path" : "as.R",
+    "properties" : {
+        "cursorPosition" : "305,9",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

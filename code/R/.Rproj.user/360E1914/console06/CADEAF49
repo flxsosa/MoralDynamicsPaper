@@ -1,0 +1,66 @@
+]0;~/Dropbox/moral_dynamics/code/R[?1034htwizzler$ df.tmp = df.long %>% # Grab clips from structured trial data
+bash: df.tmp: command not found
+]0;~/Dropbox/moral_dynamics/code/Rtwizzler$   select(clips) %>% 
+bash: syntax error near unexpected token `('
+]0;~/Dropbox/moral_dynamics/code/Rtwizzler$   filter(duplicated(clips))
+bash: syntax error near unexpected token `duplicated'
+]0;~/Dropbox/moral_dynamics/code/Rtwizzler$ [Ktwizzler$ ]0;~/Dropbox/moral_dynamics/code/R[?1034htwizzler$ # EXP2: Read in and structure data ------------------------------------------------------------------
+]0;~/Dropbox/moral_dynamics/code/Rtwizzler$ 
+]0;~/Dropbox/moral_dynamics/code/Rtwizzler$ # con = dbConnect(SQLite(),dbname = "../javascript/experiment_1/participants.db");
+con = dbConnect(SQLite(),dbname = "../../data/experiment2.db");
+df.data = dbReadTable(con,"moral_dynamics")
+dbDisconnect(con)
+#filter out incompletes 
+df.data = df.data %>% 
+  filter(status %in% 3:5) %>% 
+  filter(!str_detect(uniqueid,'debug')) %>% 
+  filter(codeversion == 'experiment_2')
+# demographic data 
+df.demographics = df.data$datastring %>% 
+  spread_values(condition = jnumber('condition'),
+                age = jnumber('questiondata','age'),
+                gender = jstring('questiondata','sex'),
+                feedback = jstring('questiondata','feedback')
+  ) %>% 
+  rename(participant = document.id) %>% 
+  mutate(time = difftime(df.data$endhit,df.data$be]0;~/Dropbox/moral_dynamics/code/Rtwizzler$ con = dbConnect(SQLite(),dbname = "../../data/experiment2.db");
+bash: syntax error near unexpected token `('
+]0;~/Dropbox/moral_dynamics/code/Rtwizzler$ df.data = dbReadTable(con,"moral_dynamics")
+bash: syntax error near unexpected token `('
+]0;~/Dropbox/moral_dynamics/code/Rtwizzler$ dbDisconnect(con)
+bash: syntax error near unexpected token `con'
+]0;~/Dropbox/moral_dynamics/code/Rtwizzler$ #filter out incompletes 
+]0;~/Dropbox/moral_dynamics/code/Rtwizzler$ df.data = df.data %>% 
+bash: df.data: command not found
+]0;~/Dropbox/moral_dynamics/code/Rtwizzler$   filter(status %in% 3:5) %>% 
+bash: syntax error near unexpected token `status'
+]0;~/Dropbox/moral_dynamics/code/Rtwizzler$   filter(!str_detect(uniqueid,'debug')) %>% 
+bash: !str_detect: event not found
+twizzler$   filter(codeversion == 'experiment_2')
+bash: syntax error near unexpected token `codeversion'
+]0;~/Dropbox/moral_dynamics/code/Rtwizzler$ # demographic data 
+]0;~/Dropbox/moral_dynamics/code/Rtwizzler$ df.demographics = df.data$datastring %>% 
+bash: df.demographics: command not found
+]0;~/Dropbox/moral_dynamics/code/Rtwizzler$   spread_values(condition = jnumber('condition'),
+bash: syntax error near unexpected token `condition'
+]0;~/Dropbox/moral_dynamics/code/Rtwizzler$                 age = jnumber('questiondata','age'),
+bash: syntax error near unexpected token `('
+]0;~/Dropbox/moral_dynamics/code/Rtwizzler$                 gender = jstring('questiondata','sex'),
+bash: syntax error near unexpected token `('
+]0;~/Dropbox/moral_dynamics/code/Rtwizzler$                 feedback = jstring('questiondata','feedback')
+bash: syntax error near unexpected token `('
+]0;~/Dropbox/moral_dynamics/code/Rtwizzler$   ) %>% 
+bash: syntax error near unexpected token `)'
+]0;~/Dropbox/moral_dynamics/code/Rtwizzler$   rename(participant = document.id) %>% 
+bash: syntax error near unexpected token `participant'
+]0;~/Dropbox/moral_dynamics/code/Rtwizzler$   mutate(time = difftime(df.data$endhit,df.data$beginhit,units = 'mins'))
+bash: syntax error near unexpected token `time'
+]0;~/Dropbox/moral_dynamics/code/Rtwizzler$ # trial data 
+/moral_dynamics/code/Rtwizzler$ df.long = df.data$datastring %>% 
+bash: df.long: command not found
+]0;~/Dropbox/moral_dynamics/code/Rtwizzler$   as.tbl_json() %>% # Format datastring as json
+bash: syntax error near unexpected token `%'
+]0;~/Dropbox/moral_dynamics/code/Rtwizzler$   spread_values(participant = jstring('workerIdobject('trialdata') %>% # Enter the tiral data responses
+bash: syntax error near unexpected token `participant'
+]0;~/Dropbox/moral_dynamics/code/Rtwizzler$   spread_valumber('rating'd_values_sning mei  spread_valumber('rating'd_values_sning mei  spread_valumber('ratin.kinematics  =[K[Atwizzler$   spread_valumber('rating'd_values_sning mei  spread_valumber('rating'd_values_sning mei  spread_valumber('ratin.kinematics =
+]0;~/Dropbox/moral_dynamics/code/Rtwizzler$ 
