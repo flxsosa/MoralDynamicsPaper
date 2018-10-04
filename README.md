@@ -2,34 +2,34 @@
 
 This repo contains all material for the Moral Dynamics Project. Please contact me if you have any questions.
 
-# Code
+## Code
 
 This directory contains all code related to the project.
 
-## R
+### R
 
 Contains all of the code used to analyze and visualize our data.
 
-## Python
+### Python
 
 Contains all of the code used to develop the physical simulations for our experiments and model.
 
-## Javascript
+### Javascript
 
 Contains all of the code for our MTurk experiments.
 
-## Blender
+### Blender
 
 Contains the code used to render our physical simulations into videos using Blender.
 
-# Data
+## Data
 
 This directory contains all of the emirical and model data related to the project.
 
-# Figures
+## Figures
 
 This directory contains all of the figures used in the paper "Moral Dynamics"
 
-# Videos
+## Videos
 
 This direcoty contains all of the video stimuli created and used for the experiments.
