@@ -254,16 +254,16 @@ df.predictions = df.long %>%
 # EXP2: Regression ------------------------------------------------------------------
 
 # Statistical summaries 
-moral_model_fit = lm(moral_mean~moral_model_prediction,data=df.predictions) 
-moral_model_fit %>% summary()
-cor(df.predictions$effort_model_prediction, df.predictions$moral_mean) # Correlate model predictions with moral judgments
+moral_model_prediction = glm(moral_mean~effort,family=binomial(),data=df.predictions) 
+moral_model_prediction %>% summary()
+cor(df.predictions$moral_model_prediction, df.predictions$moral_mean) # Correlate model predictions with moral judgments
 
-effort_model_fit = lm(effort_mean~effort_model_prediction,data=df.predictions) 
-effort_model_fit %>% summary()
+effort_model_prediction = glm(effort_mean~effort,family=binomial(),data=df.predictions)
+effort_model_prediction %>% summary()
 cor(df.predictions$effort_model_prediction, df.predictions$effort_mean) # Correlate model effort with effort judgments
 
-moral_model_fit = lm(moral_mean~moral_empirical_prediction,data=df.predictions) 
-moral_model_fit %>% summary()
+moral_empirical_prediction = glm(moral_mean~effort_mean,family=binomial(),data=df.predictions) 
+moral_empirical_prediction %>% summary()
 cor(df.predictions$moral_empirical_prediction, df.predictions$moral_mean) # Correlate effort judgment with moral judgments
 
 # EXP2: Within Participant Correlation ------------------------------------------------------------------
@@ -359,14 +359,60 @@ ggplot(df.plot,aes(x=effort,y=moral))+
   geom_abline(intercept = 0, slope = 1, linetype = 2)+
   geom_smooth(method=lm,color='black')+
   # geom_errorbar(aes(ymin = effort_low, ymax = effort_high),width=0)+
-  geom_point(size=6)+
-  geom_text_repel(aes(label = index),size=10)+
+  geom_point(size=12, color='green')+
+  geom_text_repel(aes(label = index),size=22)+
   # coord_cartesian(xlim=c(25,100),ylim=c(25,100))+
-  coord_cartesian(xlim=c(0,100),ylim=c(0,100))+
-  scale_x_continuous(breaks = seq(0,100,25),labels = seq(0,100,25))+
-  scale_y_continuous(breaks = seq(0,100,25),labels = seq(0,100,25))+
-  labs(y = 'Mean Moral Judgments', x = 'Mean Effort Judgments')
-ggsave("../../figures/plots/experiment_2_scatter.png",width=18,height=15)
+  coord_cartesian(xlim=c(0,1),ylim=c(0,1))+
+  scale_x_continuous(breaks = seq(0,1,.25),labels = seq(0,1,.25))+
+  scale_y_continuous(breaks = seq(0,1,.25),labels = seq(0,1,.25))+
+  labs(y = 'Mean Moral Judgments', x = 'Mean Effort Judgments')+
+  theme(axis.text=element_text(size=50),
+        axis.title=element_text(size=70))
+ggsave("../../figures/plots/experiment_2_moral_effort_scatter.pdf",width=18,height=15)
+
+# EXP2: Plot Results - Moral Judgments Against Model (Scatterplot) --------------------------------------------------------------------
+
+# Dataframe for scatterplot of mean moral judgments by mean effort judgments
+df.plot = df.predictions %>% 
+  mutate(index = 1:nrow(.))
+
+# Generate scatterplot
+ggplot(df.plot,aes(x=moral_model_prediction,y=moral_mean))+
+  geom_abline(intercept = 0, slope = 1, linetype = 2)+
+  geom_smooth(method=lm,color='black')+
+  geom_errorbar(aes(ymin = moral_low, ymax = moral_high),width=0)+
+  geom_point(size=12,color='blue')+
+  geom_text_repel(aes(label = index),size=22)+
+  # coord_cartesian(xlim=c(25,100),ylim=c(25,100))+
+  coord_cartesian(xlim=c(0,1),ylim=c(0,1))+
+  scale_x_continuous(breaks = seq(0,1,.25),labels = seq(0,1,.25))+
+  scale_y_continuous(breaks = seq(0,1,.25),labels = seq(0,1,.25))+
+  labs(x = 'Model Predictions', y = 'Mean Moral Judgments')+
+  theme(axis.text=element_text(size=50),
+        axis.title=element_text(size=70))
+ggsave("../../figures/plots/experiment_2_moral_model_scatter.pdf",width=18,height=15)
+
+# EXP2: Plot Results - Effort Judgments Against Model (Scatterplot) --------------------------------------------------------------------
+
+# Dataframe for scatterplot of mean moral judgments by mean effort judgments
+df.plot = df.predictions %>% 
+  mutate(index = 1:nrow(.))
+
+# Generate scatterplot
+ggplot(df.plot,aes(x=effort_model_prediction,y=effort_mean))+
+  geom_abline(intercept = 0, slope = 1, linetype = 2)+
+  geom_smooth(method=lm,color='black')+
+  geom_errorbar(aes(ymin = effort_low, ymax = effort_high),width=0)+
+  geom_point(size=12,color='red')+
+  geom_text_repel(aes(label = index),size=22)+
+  # coord_cartesian(xlim=c(25,100),ylim=c(25,100))+
+  coord_cartesian(xlim=c(0,1),ylim=c(0,1))+
+  scale_x_continuous(breaks = seq(0,1,.25),labels = seq(0,1,.25))+
+  scale_y_continuous(breaks = seq(0,1,.25),labels = seq(0,1,.25))+
+  labs(x = 'Model Predictions', y = 'Mean Effort Judgments')+
+  theme(axis.text=element_text(size=50),
+        axis.title=element_text(size=70))
+ggsave("../../figures/plots/experiment_2_effort_model_scatter.pdf",width=18,height=15)
 
 # EXP2: Plot Results - Paper Figure (Bar Graph) --------------------------------------------------------------------
 
@@ -381,7 +427,7 @@ ggplot(df.plot,aes(x=condition,y=rating,fill=condition))+
   # geom_text(aes(label = clip),size=2)+
   stat_summary(fun.data = mean_cl_boot, geom = 'errorbar', width = 0, color = 'black')+
   facet_wrap(~(-1*moral_mean),ncol=6)+
-  scale_y_continuous(limits=c(0, 105),breaks=c(100,50,0),labels=c('100','50','0'))+
+  scale_y_continuous(limits=c(0, 1),breaks=c(1,.5,0),labels=c('100','50','0'))+
   scale_fill_grey(start = 0.5, end = .9)+
   labs(y = ' ')+
   theme(legend.position = 'none',
@@ -391,6 +437,6 @@ ggplot(df.plot,aes(x=condition,y=rating,fill=condition))+
         legend.title = element_blank(),
         panel.spacing.y = unit(13, "lines")
   )
-ggsave("../../figures/plots/experiment_2_paper.pdf",width=14,height=16)
+ggsave("../../figures/experiment_2_graphs.pdf",width=14,height=16)
 
 # ~~~~~~~~~~~~~ -------------------------------------------------------------------------------
