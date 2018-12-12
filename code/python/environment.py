@@ -53,8 +53,6 @@ class Environment:
 		self.coll_handlers = [x for x in handlers] if handlers else handlers
 		# Values needed for rendering the scenario in Blender
 		self.tick = 0
-		self.counter_tick = [self.tick,counter_tick]
-		self.noise = noise
 		self.agent_collision = None
 		self.patient_fireball_collision = 0
 		self.position_dict = {
@@ -89,6 +87,7 @@ class Environment:
 		self.space.add(self.agent.body, self.agent.shape,
 					   self.patient.body, self.patient.shape,
 					   self.fireball.body, self.fireball.shape)
+		
 	def update_blender_values(self):
 		'''
 		All scenarios are rendered in the physics engine Blender. In order to do this,

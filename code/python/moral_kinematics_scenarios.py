@@ -231,20 +231,17 @@ def push_patient(view=True):
 	# - - - A - - -
 	a_params, p_params, f_params = {}, {}, {}
 	# Agent parameters
-	# a_params['loc'] = (550,100) # <- check this out
 	a_params['loc'] = (500,400)
 	a_params['color'] = "blue"
 	a_params['moves'] = ['N','NS','DS2','N','N','N']
 	a_params['coll'] = 0
 	a_params['type'] = 'B'
 	# Patient parameters
-	# p_params['loc'] = (900,300) # <- check this out
 	p_params['loc'] = (900,300)
 	p_params['color'] = "green"
 	p_params['moves'] = ['L','L','L','N','N', 'N']
 	p_params['coll'] = 1
 	# Fireball parameters
-	# f_params['loc'] = (450,500) # <- check this out
 	f_params['loc'] = (300,200)
 	f_params['color'] = "red"
 	f_params['moves'] = ['N','N','N','N','N','N']

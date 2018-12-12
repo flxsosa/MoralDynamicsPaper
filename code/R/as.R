@@ -36,6 +36,34 @@ lca = function(x,y){
   }
 }
 
+# Luce's choice axiom temperature
+lca_temp = function(data,par){
+  with(data,
+    if (e1+e2 == 0){
+      return(0.5)
+    }
+    else{
+      return((e1^(1/par))/((e1^(1/par))+(e2^(1/par))))
+    })
+}
+
+lca_temp.RSS = function(data,par){
+  with(data,
+       sum((e1^(1/par))/((e1^(1/par))+(e2^(1/par))) - rating)^2)
+}
+
+# Residual square error of softmax decision and rating
+softmax.RSS <- function(data, par){
+  with(data, 
+       sum(((exp(e1*1/par - max(e1)) / (exp(e1*1/par - max(e1)) + exp(e2*1/par - max(e1)))) - rating)^2))
+}
+
+# Softmax
+softmax <- function(data,par){
+  with(data,
+       (exp(e1*1/par - max(e1)) / (exp(e1*1/par - max(e1)) + exp(e2*1/par - max(e1)))))
+}
+
 # Clips we can reconstruct from Moral Kinematics using our physics engine (see paper)
 clips_we_can_reconstruct <- c(1,3,4,7,8,9,10,11,12,20,21,22,23,24,25,26,27,28)
 clips_in_experiment_2 <- c(1,3,4,7,8,9,10,11,12)
@@ -94,6 +122,36 @@ df.kinematics = read.csv("../../data/empirical/moral_kinematics.csv") %>%
   filter(left %in% clips_we_can_reconstruct) %>% # Should be clips_in_experiment_1
   filter(right %in% clips_we_can_reconstruct) # Should be clips_in_experiment_1
 
+# EXP1: Temperature Fitting --------------------------------------------------------------------
+
+df.empirical_data = df.long %>%
+  group_by(clips) %>%
+  mutate(rating = ifelse(rating<=3,1,0)) %>%
+  summarise(rating = mean(rating)) %>%
+  ungroup()
+# Data to be passed
+df.data = df.long %>% 
+  mutate(clip_pairs = clips) %>%
+  group_by(clips) %>% 
+  summarise(rating = mean(rating)) %>% 
+  ungroup() %>% 
+  mutate(videos = clips) %>%
+  separate(clips,into = c('clip1','clip2'),sep="_") %>%
+  mutate_at(vars(contains('clip')),funs(as.numeric(.))) %>% 
+  left_join(df.exp1_eff_val %>% 
+              select(clip,effort), by = c("clip1" = "clip")) %>%
+  left_join(df.exp1_eff_val %>% 
+              select(clip,effort), by = c("clip2" = "clip")) %>%
+  mutate(e1 = effort.x/max(effort.x)) %>%
+  mutate(e2 = effort.y/max(effort.x)) %>%
+  mutate(clips = paste(clip1,clip2,sep="_")) %>%
+  left_join(df.empirical_data, by='clips') %>%
+  mutate(rating = rating.y) %>%
+  select('e1','e2','rating','clips')
+
+temperature = optim(par = 0, fn = softmax.RSS, data = df.data, method='Brent',lower=-100,upper=100)$par
+temperature = optim(par = 0, fn = lca_temp.RSS, data = df.data, method='Brent',lower=-100,upper=100)$par
+
 # EXP1: Model Predictions  --------------------------------------------------------------------
 
 # Dataframe containing ground-truth effort values for each scenario
@@ -103,7 +161,7 @@ df.exp1_eff_val = read.csv("../../data/model/experiment1.csv") %>%
   filter(clip != 'scenario') %>% # Filter out headers from csv file
   filter(clip %in% clips_in_experiment_2) # Should be clips_in_experiment_1
 
-# Dataframe containing LCA predictions of moral judgment
+# Dataframe containing softmax predictions of moral judgment
 df.predictions = df.long %>% 
   mutate(clip_pairs = clips) %>%
   group_by(clips) %>% 
@@ -117,7 +175,7 @@ df.predictions = df.long %>%
               select(clip,effort), by = c("clip2" = "clip")) %>%
   rename(effort.1 = effort.x) %>%
   rename(effort.2 = effort.y) %>%
-  mutate(lca = lca(effort.1,effort.2),
+  mutate(lca = lca_temp(df.data,temperature),
          fit = lm(rating~lca,data=.)$fitted.values,
          clips = paste(clip1,clip2,sep="_"),
          index = 'Model',
@@ -182,7 +240,7 @@ for(i in c(1:9)){
           axis.text.y = element_text(size=30,face='bold'),
           legend.title = element_blank()
     )
-  # ggsave(paste("../../figures/plots/experiment_1/collapsed_mean_",toString(toString(df.plot[i,]$clips)),".pdf"),width=8,height=4)
+  ggsave(paste("../../figures/plots/experiment_1/collapsed_mean_",toString(toString(df.plot[i,]$clips)),".pdf"),width=8,height=4)
 }
 
 # ~~~~~~~~~~~~~ -------------------------------------------------------------------------------
@@ -247,24 +305,20 @@ df.predictions = df.long %>%
   left_join(df.exp2_eff_val, by = c('clip'='names')) %>% 
   mutate(effort = rescale(effort, to=c(0,1))) %>%
   #filter(!(clip %in% c('video4', 'video12'))) %>% # Test
-  mutate(effort_model_prediction = glm(effort_mean~effort,family=binomial(),data=.)$fitted.values, # Model prediction of effort judgments
-         moral_empirical_prediction = glm(moral_mean~effort_mean,family=binomial(),data=.)$fitted.values, # Prediction of moral judgments using effort judgments
-         moral_model_prediction = glm(moral_mean~effort,family=binomial(),data=.)$fitted.values) # Model prediction of moral judgments
+  mutate(effort_model_prediction = lm(effort_mean~effort,data=.)$fitted.values, # Model prediction of effort judgments
+         moral_empirical_prediction = lm(moral_mean~effort_mean,data=.)$fitted.values, # Prediction of moral judgments using effort judgments
+         moral_model_prediction = lm(moral_mean~effort,data=.)$fitted.values) # Model prediction of moral judgments
+
+cf = confint(lm(effort_mean~effort,data=df.predictions))
 
 # EXP2: Regression ------------------------------------------------------------------
 
 # Statistical summaries 
-moral_model_prediction = glm(moral_mean~effort,family=binomial(),data=df.predictions) 
-moral_model_prediction %>% summary()
-cor(df.predictions$moral_model_prediction, df.predictions$moral_mean) # Correlate model predictions with moral judgments
+cor.test(df.predictions$moral_model_prediction, df.predictions$moral_mean, method='spearman') # Correlate model predictions with moral judgments
 
-effort_model_prediction = glm(effort_mean~effort,family=binomial(),data=df.predictions)
-effort_model_prediction %>% summary()
-cor(df.predictions$effort_model_prediction, df.predictions$effort_mean) # Correlate model effort with effort judgments
+cor.test(df.predictions$effort_model_prediction, df.predictions$effort_mean, method='spearman') # Correlate model effort with effort judgments
 
-moral_empirical_prediction = glm(moral_mean~effort_mean,family=binomial(),data=df.predictions) 
-moral_empirical_prediction %>% summary()
-cor(df.predictions$moral_empirical_prediction, df.predictions$moral_mean) # Correlate effort judgment with moral judgments
+cor.test(df.predictions$moral_empirical_prediction, df.predictions$moral_mean, method='spearman') # Correlate effort judgment with moral judgments
 
 # EXP2: Within Participant Correlation ------------------------------------------------------------------
 
@@ -303,7 +357,7 @@ for (i in c(1:length(df.predictions$clip))) {
 }
 print(square_error/length(df.predictions$clip))
 
-# EXP2: Bootstrapped Confidence Intervals ------------------------------------------------------------------
+# EXP2: Bootstrapped Confidence Intervals Model vs Moral Mean ------------------------------------------------------------------
 
 # Statistic function
 estimation_func <- function(original_dataset, d) {
@@ -316,12 +370,9 @@ estimation_func <- function(original_dataset, d) {
     gather(index,value,-c(condition,clip)) %>% 
     unite(condition_index,condition,index) %>% 
     spread(condition_index,value) %>% 
-    left_join(df.exp2_eff_val, by = c('clip'='names')) %>% 
-    mutate(effort = rescale(effort, to=c(0,1))) # Rescale effort values from physics engine to [0,1]
-  # Fit a glm to the sampled dataset and gather fitted values
-  fitted_values = glm(moral_mean~effort, family = binomial(), data=sampled_dataset)$fitted.values
+    left_join(df.exp2_eff_val, by = c('clip'='names')) 
   # Measure correaltion between fitted values and sampled_dataset
-  corr = cor(sampled_dataset$moral_mean, fitted_values)
+  corr = cor.test(sampled_dataset$moral_mean, sampled_dataset$effort, method='spearman')$estimate
   # Return correlation
   return(corr)
 }
@@ -336,32 +387,96 @@ moral_dataset$participant <- moral_dataset %>%
 
 # Make boot object
 b = boot(moral_dataset, estimation_func, R=1000)
-summary(b)
 # Gather ci for correlations
 ci = boot.ci(b,conf=.95)
 # Print out summary of ci
-summary(ci)
+ci
+
+# EXP2: Bootstrapped Confidence Intervals Model vs Effort Mean ------------------------------------------------------------------
+
+# Statistic function
+estimation_func <- function(original_dataset, d) {
+  # Gather sampled_dataset
+  sampled_dataset = original_dataset %>% 
+    filter(participant %in% d) %>% # Gather sample from original dataset
+    group_by(condition,clip) %>% 
+    summarise(mean = mean(rating)) %>% # Compute mean for responses across videos
+    ungroup() %>% 
+    gather(index,value,-c(condition,clip)) %>% 
+    unite(condition_index,condition,index) %>% 
+    spread(condition_index,value) %>% 
+    left_join(df.exp2_eff_val, by = c('clip'='names')) 
+  # Measure correaltion between fitted values and sampled_dataset
+  corr = cor.test(sampled_dataset$effort_mean, sampled_dataset$effort, method='spearman')$estimate
+  # Return correlation
+  return(corr)
+}
+
+# Gather moral condition only
+effort_dataset = df.long %>%
+  filter(condition == 'effort') 
+
+# Renumber participant IDs (this is important because we use participant IDs as indices!)
+effort_dataset$participant <- effort_dataset %>% 
+  group_indices(effort_dataset$participant)
+
+# Make boot object
+b = boot(effort_dataset, estimation_func, R=1000)
+# Gather ci for correlations
+ci = boot.ci(b,conf=.95)
+# Print out summary of ci
+ci
+
+# EXP2: Bootstrapped Confidence Intervals Effort Mean vs Moral Mean ------------------------------------------------------------------
+
+# Statistic function
+estimation_func <- function(original_dataset, d) {
+  # Gather sampled_dataset
+  sampled_dataset = original_dataset %>% 
+    filter(participant %in% d) %>% # Gather sample from original dataset
+    group_by(condition,clip) %>% 
+    summarise(mean = mean(rating)) %>% # Compute mean for responses across videos
+    ungroup() %>% 
+    gather(index,value,-c(condition,clip)) %>% 
+    unite(condition_index,condition,index) %>% 
+    spread(condition_index,value) %>% 
+    left_join(df.exp2_eff_val, by = c('clip'='names')) 
+  # Measure correaltion between fitted values and sampled_dataset
+  corr = cor.test(sampled_dataset$moral_mean, sampled_dataset$effort_mean, method='spearman')$estimate
+  # Return correlation
+  return(corr)
+}
+
+# Gather moral condition only
+dataset = df.long 
+
+# Renumber participant IDs (this is important because we use participant IDs as indices!)
+dataset$participant <- dataset %>% 
+  group_indices(dataset$participant)
+
+# Make boot object
+b = boot(dataset, estimation_func, R=2000)
+# Gather ci for correlations
+ci = boot.ci(b,conf=.95)
+# Print out summary of ci
+ci
 
 # EXP2: Plot Results - Mean Judgments (Scatterplot) --------------------------------------------------------------------
 
 # Dataframe for scatterplot of mean moral judgments by mean effort judgments
-df.plot = df.long %>% 
-  mutate(rating = as.numeric(rating)) %>% 
-  group_by(clip,condition) %>% 
-  summarise(mean = mean(rating)) %>% 
-  spread(condition,mean) %>% 
-  ungroup() %>% 
-  select(clip,effort,moral) %>% 
+df.plot = df.predictions %>%
   mutate(index = 1:nrow(.))
 
 # Generate scatterplot
-ggplot(df.plot,aes(x=effort,y=moral))+
+ggplot(df.plot,aes(x=effort_mean,y=moral_mean))+
   geom_abline(intercept = 0, slope = 1, linetype = 2)+
   geom_smooth(method=lm,color='black')+
-  # geom_errorbar(aes(ymin = effort_low, ymax = effort_high),width=0)+
+  geom_errorbar(aes(ymin = moral_low, ymax = moral_high),width=0)+
+  geom_errorbarh(aes(xmin = effort_low, xmax = effort_high),width=0)+
   geom_point(size=12, color='green')+
-  geom_text_repel(aes(label = index),size=22)+
-  # coord_cartesian(xlim=c(25,100),ylim=c(25,100))+
+  geom_label_repel(aes(label = index),size=22,
+                   box.padding = 1.2, point.padding = 1,
+                   na.rm=TRUE)+
   coord_cartesian(xlim=c(0,1),ylim=c(0,1))+
   scale_x_continuous(breaks = seq(0,1,.25),labels = seq(0,1,.25))+
   scale_y_continuous(breaks = seq(0,1,.25),labels = seq(0,1,.25))+
@@ -382,12 +497,13 @@ ggplot(df.plot,aes(x=moral_model_prediction,y=moral_mean))+
   geom_smooth(method=lm,color='black')+
   geom_errorbar(aes(ymin = moral_low, ymax = moral_high),width=0)+
   geom_point(size=12,color='blue')+
-  geom_text_repel(aes(label = index),size=22)+
-  # coord_cartesian(xlim=c(25,100),ylim=c(25,100))+
+  geom_label_repel(aes(label = index),size=22,
+                   box.padding = 1.2, point.padding = 1,
+                   na.rm=TRUE)+
   coord_cartesian(xlim=c(0,1),ylim=c(0,1))+
   scale_x_continuous(breaks = seq(0,1,.25),labels = seq(0,1,.25))+
   scale_y_continuous(breaks = seq(0,1,.25),labels = seq(0,1,.25))+
-  labs(x = 'Model Predictions', y = 'Mean Moral Judgments')+
+  labs(x = 'Model Moral Predictions', y = 'Mean Moral Judgments')+
   theme(axis.text=element_text(size=50),
         axis.title=element_text(size=70))
 ggsave("../../figures/plots/experiment_2_moral_model_scatter.pdf",width=18,height=15)
@@ -404,12 +520,13 @@ ggplot(df.plot,aes(x=effort_model_prediction,y=effort_mean))+
   geom_smooth(method=lm,color='black')+
   geom_errorbar(aes(ymin = effort_low, ymax = effort_high),width=0)+
   geom_point(size=12,color='red')+
-  geom_text_repel(aes(label = index),size=22)+
-  # coord_cartesian(xlim=c(25,100),ylim=c(25,100))+
+  geom_label_repel(aes(label = index),size=22,
+                   box.padding = 1.2, point.padding = 1,
+                   na.rm=TRUE)+
   coord_cartesian(xlim=c(0,1),ylim=c(0,1))+
   scale_x_continuous(breaks = seq(0,1,.25),labels = seq(0,1,.25))+
   scale_y_continuous(breaks = seq(0,1,.25),labels = seq(0,1,.25))+
-  labs(x = 'Model Predictions', y = 'Mean Effort Judgments')+
+  labs(x = 'Model Effort Predictions', y = 'Mean Effort Judgments')+
   theme(axis.text=element_text(size=50),
         axis.title=element_text(size=70))
 ggsave("../../figures/plots/experiment_2_effort_model_scatter.pdf",width=18,height=15)
@@ -422,10 +539,34 @@ df.plot = df.long %>%
 
 ggplot(df.plot,aes(x=condition,y=rating,fill=condition))+
   stat_summary(fun.y = mean, geom = 'bar', color = 'black')+
+  geom_point(aes(y = rating), position = position_jitter(width=0.15),size = 1.3, alpha = 0.5) +
   geom_point(aes(x=c('moral'),y=moral_model_prediction),color='black',fill='light grey',shape=21,size=6)+ # Model effort prediction
   geom_point(aes(x=c('effort'),y=effort_model_prediction),color='black',shape=21,size=6)+
-  # geom_text(aes(label = clip),size=2)+
   stat_summary(fun.data = mean_cl_boot, geom = 'errorbar', width = 0, color = 'black')+
+  facet_wrap(~(-1*moral_mean),ncol=6)+
+  scale_y_continuous(limits=c(0, 1.1),breaks=c(1,.5,0),labels=c('100','50','0'))+
+  scale_fill_grey(start = 0.5, end = .9)+
+  labs(y = ' ')+
+  theme(legend.position = 'none',
+        axis.title.x = element_blank(),
+        axis.text.x = element_blank(),
+        strip.text.x = element_blank(),
+        legend.title = element_blank(),
+        panel.spacing.y = unit(13, "lines")
+  )
+ggsave("../../figures/experiment_2_graphs.pdf",width=14,height=16)
+
+# EXP2: Plot Results - Paper Figure (Box Plot) --------------------------------------------------------------------
+
+df.plot = df.long %>%
+  left_join(df.predictions) %>%
+  mutate(clip = as.factor(clip))
+
+ggplot(df.plot,aes(x=condition,y=rating,fill=condition))+
+  geom_boxplot(width = .7, guides = FALSE, outlier.shape = NA, alpha = 0.5) +
+  geom_point(aes(y = rating), position = position_jitter(width=0.15),size = 1.3, alpha = 0.8) +
+  geom_point(aes(x=c('moral'),y=moral_model_prediction),color='black',fill='light grey',shape=24,size=6)+ # Model effort prediction
+  geom_point(aes(x=c('effort'),y=effort_model_prediction),color='black',shape=24,size=6)+
   facet_wrap(~(-1*moral_mean),ncol=6)+
   scale_y_continuous(limits=c(0, 1),breaks=c(1,.5,0),labels=c('100','50','0'))+
   scale_fill_grey(start = 0.5, end = .9)+
@@ -438,5 +579,29 @@ ggplot(df.plot,aes(x=condition,y=rating,fill=condition))+
         panel.spacing.y = unit(13, "lines")
   )
 ggsave("../../figures/experiment_2_graphs.pdf",width=14,height=16)
+# EXP2: Plot Results - Paper Figure (Sideways Box Plot) --------------------------------------------------------------------
+
+df.plot = df.long %>%
+  left_join(df.predictions) %>%
+  mutate(clip = as.factor(clip))
+
+ggplot(df.plot,aes(x=condition,y=rating,fill=condition))+
+  geom_boxplot(width = .7, guides = FALSE, outlier.shape = NA, alpha = 0.5) +
+  geom_point(aes(y = rating), position = position_jitter(width=0.15),size = 1.3, alpha = 0.8) +
+  geom_point(aes(x=c('moral'),y=moral_model_prediction),color='black',fill='light grey',shape=24,size=6)+ # Model effort prediction
+  geom_point(aes(x=c('effort'),y=effort_model_prediction),color='black',shape=24,size=6)+
+  facet_wrap(~(-1*moral_mean),ncol=4)+
+  scale_y_continuous(limits=c(0, 1),breaks=c(1,.5,0),labels=c('100','50','0'))+
+  scale_fill_grey(start = 0.5, end = .9)+
+  labs(y = ' ')+
+  coord_flip()+
+  theme(legend.position = 'none',
+        axis.title.x = element_blank(),
+        # axis.text.x = element_blank(),
+        strip.text.x = element_blank(),
+        legend.title = element_blank(),
+        panel.spacing.y = unit(13, "lines")
+  )
+ggsave("../../figures/experiment_2_sideways_graphs.pdf",width=14,height=16)
 
 # ~~~~~~~~~~~~~ -------------------------------------------------------------------------------
