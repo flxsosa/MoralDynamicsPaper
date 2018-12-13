@@ -2,6 +2,8 @@
 
 This repo contains all material for the paper "Moral Dynamics: Grounding Moral Judgment in Intuitive Physics and Intuitive Psychology" by Sosa, FA, et al. Please contact me if you have any questions.
 
+![Banner](figures/banner.png)
+
 # Repo Structure
 
 ```bash
