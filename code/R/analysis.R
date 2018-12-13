@@ -4,7 +4,6 @@
 #' date: December, 13, 2018
 #' ---
 
-
 #+ Load Packages
 # Load packages  ------------------------------------------------------------------------------
 
@@ -94,14 +93,14 @@ clip_number_name_map_mk = c(3,7,12,4,1,9,10,11,8)
 # EXP1: Read in and Structure Data ------------------------------------------------------------------
 
 # Connect to database file and collect data
-con = dbConnect(SQLite(),dbname = "../../data/empirical/experiment1.db");
+con = dbConnect(SQLite(),dbname = "../../data/empirical/experiment1_anonymized.db");
 df.data = dbReadTable(con,"moral_dynamics")
 dbDisconnect(con)
 
 # Filter out incomplete trials by users
 df.data = df.data %>% 
   filter(status %in% 3:5) %>% 
-  filter(!str_detect(uniqueid,'debug')) %>%
+  # filter(!str_detect(uniqueid,'debug')) %>%
   filter(codeversion == 'experiment_3')
 
 # Grab demographic data 
@@ -260,7 +259,7 @@ for(i in c(1:9)){
 # EXP2: Read in and Structure Data ------------------------------------------------------------------
 
 # Connect to database file and collect data
-con = dbConnect(SQLite(),dbname = "../../data/empirical/experiment2.db");
+con = dbConnect(SQLite(),dbname = "../../data/empirical/experiment2_anonymized.db");
 df.data = dbReadTable(con,"moral_dynamics")
 dbDisconnect(con)
 

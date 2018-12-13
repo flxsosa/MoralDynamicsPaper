@@ -14,6 +14,7 @@ df.table = dbReadTable(con,tablename)
 dbDisconnect(con)
 
 df.table = df.table %>%
+  filter(!str_detect(uniqueid,'debug')) %>%
   mutate(datastring = str_replace_all(datastring,uniqueid,as.character(row_number())),
          datastring = str_replace_all(datastring,workerid,as.character(row_number()))) %>%
   select(-uniqueid,-workerid,-ipaddress)
