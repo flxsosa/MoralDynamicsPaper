@@ -47,7 +47,7 @@ def long_distance(view=True):
 	vel = 300,150,150
 	env = Environment(a_params,p_params,f_params,vel,handlers,view)
 	env.run()
-	return env.agent.effort_expended
+	return env
 
 def dodge(view=True):
 	# - - - ^ - - -
@@ -76,7 +76,7 @@ def dodge(view=True):
 	vel = 300,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view)
 	env.run()
-	return env.agent.effort_expended
+	return env
 
 def bystander(view=True):
 	# - - - A - - -
@@ -105,7 +105,7 @@ def bystander(view=True):
 	vel = 300,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view)
 	env.run()
-	return env.agent.effort_expended
+	return env
 
 def stays_put(view=True):
 	# - - - - P - -
@@ -134,8 +134,7 @@ def stays_put(view=True):
 	vel = 300,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view)
 	env.run()
-	print("je {}".format(env.agent.effort_expended))
-	return env.agent.effort_expended
+	return env
 
 def short_distance(view=True):
 	# - - - - - - -
@@ -164,7 +163,7 @@ def short_distance(view=True):
 	vel = 300,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view)
 	env.run()
-	return env.agent.effort_expended
+	return env
 
 def med_push(view=True):
 	# - - - - - - -
@@ -193,7 +192,7 @@ def med_push(view=True):
 	vel = 300,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view)
 	env.run()
-	return env.agent.effort_expended
+	return env
 
 def long_push(view=True):
 	# - - - - - - -
@@ -222,7 +221,7 @@ def long_push(view=True):
 	vel = 300,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view)
 	env.run()
-	return env.agent.effort_expended
+	return env
 
 def push_patient(view=True):
 	# Test two types of agents, good and bad in the scenario
@@ -252,7 +251,7 @@ def push_patient(view=True):
 	vel = 300,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view)
 	env.run()
-	return env.agent.effort_expended
+	return env
 
 def double_push(view=True):
 	# - - - - - - -
@@ -281,7 +280,7 @@ def double_push(view=True):
 	vel = 300,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view)
 	env.run()
-	return env.agent.effort_expended
+	return env
 
 def harm_moving_moving(view=True):
 	# Test two types of agents, good and bad in the scenario
@@ -314,7 +313,7 @@ def harm_moving_moving(view=True):
 	vel = 300,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view)
 	env.run()
-	return env.agent.effort_expended
+	return env
 
 def victim_moving_moving(view=True):
 	# Test two types of agents, good and bad in the scenario
@@ -347,7 +346,7 @@ def victim_moving_moving(view=True):
 	vel = 300,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view)
 	env.run()
-	return env.agent.effort_expended
+	return env
 
 def harm_moving_static(view=True):
 	# Test two types of agents, good and bad in the scenario
@@ -379,7 +378,7 @@ def harm_moving_static(view=True):
 	vel = 300,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view)
 	env.run()
-	return env.agent.effort_expended
+	return env
 
 def victim_moving_static(view=True):
 	# Test two types of agents, good and bad in the scenario
@@ -412,7 +411,7 @@ def victim_moving_static(view=True):
 	vel = 300,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view)
 	env.run()
-	return env.agent.effort_expended
+	return env
 
 def harm_static_moving(view=True):
 	# Test two types of agents, good and bad in the scenario
@@ -442,7 +441,7 @@ def harm_static_moving(view=True):
 	vel = 300,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view)
 	env.run()
-	return env.agent.effort_expended
+	return env
 
 def victim_static_moving(view=True):
 	# Test two types of agents, good and bad in the scenario
@@ -472,7 +471,7 @@ def victim_static_moving(view=True):
 	vel = 300,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view)
 	env.run()
-	return env.agent.effort_expended
+	return env
 
 def harm_static_static(view=True):
 	# - - - - - - -
@@ -501,7 +500,7 @@ def harm_static_static(view=True):
 	vel = 300,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view)
 	env.run()
-	return env.agent.effort_expended
+	return env
 
 def victim_static_static(view=True):
 	# - - - - - - -
@@ -530,4 +529,4 @@ def victim_static_static(view=True):
 	vel = 300,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view)
 	env.run()
-	return env.agent.effort_expended
+	return env

@@ -107,7 +107,7 @@ class Environment:
 		# Increment the simulation tick
 		self.tick += 1
 		# Record when the Agent collides with someone else
-		if not handlers.A_COLLISION: self.agent_collision = self.tick
+		if not handlers.PF_COLLISION: self.agent_collision = self.tick
 
 	def run(self):
 		'''
@@ -126,7 +126,7 @@ class Environment:
 		# Running flag
 		running = True
 		# Main loop. Run simulation until collision between Green Agent 
-		# and Fireball
+		# 	and Fireball
 		while running and not handlers.PF_COLLISION:
 			try:
 				# Generate the next tick in the simulation for each object

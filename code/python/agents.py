@@ -105,8 +105,8 @@ class Agent:
 
 	def stay_put(self, velocity, clock, screen, space, options, view):
 		# Agent stays put. This is different from do_nothing in that the 
-		# agent will apply a force to maintain its current location if 
-		# pushed or pulled in some direction.
+		# 	agent will apply a force to maintain its current location if 
+		# 	pushed or pulled in some direction.
 		for _ in range(wait_period):
 			if view:
 				for event in pygame.event.get():
@@ -115,7 +115,6 @@ class Agent:
 				imp = -1*self.body.velocity[1]
 				self.body.apply_impulse_at_local_point((0,imp))
 				self.effort_expended += abs(imp)
-				print(self.effort_expended)
 			if abs(self.body.velocity[0]) > 0:
 				imp = -1*self.body.velocity[0]
 				self.body.apply_impulse_at_local_point((imp,0))
@@ -124,7 +123,7 @@ class Agent:
 
 	def move_right_special(self,velocity,clock,screen,space,options,view):
 		# Move agent right (special case for replicating scenarios in 
-		# Moral Kinematics)
+		# 	Moral Kinematics)
 		tick = 0
 		intended_x_pos = self.body.position[0]+move_lat_distance+move_lat_distance*0.6
 		while self.body.position[0] < intended_x_pos:
@@ -140,7 +139,7 @@ class Agent:
 
 	def move_down_special(self,velocity,clock,screen,space,options,view,t=None,n=None):
 		# Move agent down (special case for replicating scenarios in 
-		# Moral Kinematics)
+		# 	Moral Kinematics)
 		intended_y_pos = self.body.position[1]-move_long_distance/3.0
 		while self.body.position[1] > intended_y_pos:
 			if view:
@@ -159,7 +158,7 @@ class Agent:
 
 	def move_down_special_2(self,velocity,clock,screen,space,options,view,t=None,n=None):
 		# Move agent down (special case for replicating scenarios in 
-		# Moral Kinematics)
+		# 	Moral Kinematics)
 		intended_y_pos = self.body.position[1]-move_long_distance/2.5
 		while self.body.position[1] > intended_y_pos:
 			if view:
@@ -195,7 +194,7 @@ class Agent:
 
 	def do_nothing_special_2(self,velocity,clock,screen,space,options,view,t=None,n=None):
 		# Do nothing (special case for replicating scenarios in 
-		# Moral Kinematics)
+		# 	Moral Kinematics)
 		for _ in range(wait_period+10):
 			if view:
 				for event in pygame.event.get():
