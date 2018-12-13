@@ -311,7 +311,7 @@ df.predictions = df.long %>%
 
 cf = confint(lm(effort_mean~effort,data=df.predictions))
 
-# EXP2: Regression ------------------------------------------------------------------
+# EXP2: Spearman Correlations ------------------------------------------------------------------
 
 # Statistical summaries 
 cor.test(df.predictions$moral_model_prediction, df.predictions$moral_mean, method='spearman') # Correlate model predictions with moral judgments
