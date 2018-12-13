@@ -1,6 +1,30 @@
 # MoralDynamicsPaper
 
-This repo contains all material for the Moral Dynamics Project. Please contact me if you have any questions.
+This repo contains all material for the paper "Moral Dynamics: Grounding Moral Judgment in Intuitive Physics and Intuitive Psychology" by Sosa, FA, et al. Please contact me if you have any questions.
+
+# Repo Structure
+
+```bash
+├── code
+│   ├── Blender
+│   ├── R
+│   ├── javascript
+│   │   ├── experiment_1
+│   │   └── experiment_2
+│   ├── om
+│   └── python
+├── data
+│   ├── empirical
+│   ├── json
+│   └── model
+├── figures
+│   └── plots
+│       ├── experiment_1
+│       └── experiment_2
+└── videos
+    ├── experiment_1
+    └── experiment_2
+```
 
 ## Code
 
