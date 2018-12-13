@@ -184,41 +184,7 @@ df.predictions = df.long %>%
          rating = lca) %>%
   select('clips','rating','rating.low','rating.high','index')
 
-# EXP1: Plot Results - Mean Judgment Comparison (Bar Graph) -----------------------------------------------------
-
-# Dataframe for bar graph of mean moral judgments across videos
-df.plot = df.long %>% 
-  mutate(rating = ifelse(rating <= 3,1,0)) %>% 
-  group_by(clips) %>% 
-  summarise(rating.mean = mean(rating),
-            rating.high = smean.cl.boot(rating)[2],
-            rating.low = smean.cl.boot(rating)[3]
-  ) %>% 
-  ungroup() %>% 
-  left_join(df.kinematics %>% select(clips,kinematics = rating)) %>%
-  gather("index","rating",c(rating.mean,kinematics)) %>% 
-  mutate_at(vars(rating.high,rating.low),funs(ifelse(index == 'kinematics',rating,.))) %>% 
-  mutate(index = factor(index,levels = c('rating.mean','kinematics'), labels = c('Experiment 1', 'Moral Kinematics'))) %>%
-  mutate(clips = as.factor(clips)) %>%
-  select('clips', 'index','rating','rating.low','rating.high') %>%
-  rbind(df.predictions)
-
-# Generate bar graph
-ggplot(df.plot,aes(x=index,y=rating,fill=index))+
-  geom_bar(stat = 'identity',color = 'black', position = position_dodge(0.8), width = 0.8)+
-  geom_linerange(data=df.plot,aes(ymin=rating.low,ymax=rating.high), position = position_dodge(0.8), width = 0.8)+
-  facet_wrap(~clips,ncol=6)+
-  labs(y = 'Percent Particpants Judging\nLeft Video as Worse')+
-  scale_y_continuous(breaks=c(1.0,0.5,0),labels=c('100%','50%','0%'))+
-  theme_bw()+
-  theme(legend.position = 'right',
-        axis.title.x = element_blank(),
-        axis.text.x = element_blank(),
-        axis.text.y = element_text(size=18),
-        legend.title = element_blank()
-  )
-
-# EXP1: Plot Results - Paper Figure (Bar Graph)  -----------------------------------------------------
+# EXP1: Plot Results - Main Results (Bar Graph)  -----------------------------------------------------
 
 # Generate bar graphs used in paper
 for(i in c(1:9)){
@@ -309,8 +275,6 @@ df.predictions = df.long %>%
          moral_empirical_prediction = lm(moral_mean~effort_mean,data=.)$fitted.values, # Prediction of moral judgments using effort judgments
          moral_model_prediction = lm(moral_mean~effort,data=.)$fitted.values) # Model prediction of moral judgments
 
-cf = confint(lm(effort_mean~effort,data=df.predictions))
-
 # EXP2: Spearman Correlations ------------------------------------------------------------------
 
 # Statistical summaries 
@@ -319,43 +283,6 @@ cor.test(df.predictions$moral_model_prediction, df.predictions$moral_mean, metho
 cor.test(df.predictions$effort_model_prediction, df.predictions$effort_mean, method='spearman') # Correlate model effort with effort judgments
 
 cor.test(df.predictions$moral_empirical_prediction, df.predictions$moral_mean, method='spearman') # Correlate effort judgment with moral judgments
-
-# EXP2: Within Participant Correlation ------------------------------------------------------------------
-
-# Initialize regression sum to 0
-regression_sum = 0
-# Iterate through all participants and leave one out and correlate with others
-for (i in c(1:length(unique(df.long$participant)))) {
-  # Temporary dataframe 
-  df.tmp = df.predictions %>%
-    select('clip','effort')
-  # Participant dataframe
-  df.participant = df.long %>%
-    filter(participant %in% c(i)) %>%
-    select('clip', 'rating')
-  # Add to the regression sum
-  regression_sum = regression_sum + abs(cor(df.tmp$effort, df.participant$rating))
-}
-regression_sum = regression_sum/length(unique(df.long$participant))
-
-# EXP2: Cross Validation ------------------------------------------------------------------
-
-# Initialize square error to 0
-square_error = 0
-for (i in c(1:length(df.predictions$clip))) {
-  # Filter out clips
-  df.tmp = df.predictions %>%
-    filter(clip != df.predictions$clip[i])
-  # Fit glm to remaining clips
-  moral_model_fit = glm(moral_mean~effort,family=binomial(),data=df.tmp) 
-  # Actual value
-  y = df.predictions$moral_mean[i]
-  # Predicted value
-  y_hat = predict(moral_model_fit,data.frame(effort=df.predictions$effort[i]),type='response')
-  # Sum square error
-  square_error = square_error + (y - y_hat)^2
-}
-print(square_error/length(df.predictions$clip))
 
 # EXP2: Bootstrapped Confidence Intervals Model vs Moral Mean ------------------------------------------------------------------
 
@@ -412,7 +339,7 @@ estimation_func <- function(original_dataset, d) {
   return(corr)
 }
 
-# Gather moral condition only
+# Gather effort condition only
 effort_dataset = df.long %>%
   filter(condition == 'effort') 
 
@@ -447,7 +374,7 @@ estimation_func <- function(original_dataset, d) {
   return(corr)
 }
 
-# Gather moral condition only
+# Gather both conditions
 dataset = df.long 
 
 # Renumber participant IDs (this is important because we use participant IDs as indices!)
@@ -531,7 +458,7 @@ ggplot(df.plot,aes(x=effort_model_prediction,y=effort_mean))+
         axis.title=element_text(size=70))
 ggsave("../../figures/plots/experiment_2_effort_model_scatter.pdf",width=18,height=15)
 
-# EXP2: Plot Results - Paper Figure (Bar Graph) --------------------------------------------------------------------
+# EXP2: Plot Results - Main Results (Bar Graph) --------------------------------------------------------------------
 
 df.plot = df.long %>%
   left_join(df.predictions) %>%
@@ -554,54 +481,6 @@ ggplot(df.plot,aes(x=condition,y=rating,fill=condition))+
         legend.title = element_blank(),
         panel.spacing.y = unit(13, "lines")
   )
-ggsave("../../figures/experiment_2_graphs.pdf",width=14,height=16)
-
-# EXP2: Plot Results - Paper Figure (Box Plot) --------------------------------------------------------------------
-
-df.plot = df.long %>%
-  left_join(df.predictions) %>%
-  mutate(clip = as.factor(clip))
-
-ggplot(df.plot,aes(x=condition,y=rating,fill=condition))+
-  geom_boxplot(width = .7, guides = FALSE, outlier.shape = NA, alpha = 0.5) +
-  geom_point(aes(y = rating), position = position_jitter(width=0.15),size = 1.3, alpha = 0.8) +
-  geom_point(aes(x=c('moral'),y=moral_model_prediction),color='black',fill='light grey',shape=24,size=6)+ # Model effort prediction
-  geom_point(aes(x=c('effort'),y=effort_model_prediction),color='black',shape=24,size=6)+
-  facet_wrap(~(-1*moral_mean),ncol=6)+
-  scale_y_continuous(limits=c(0, 1),breaks=c(1,.5,0),labels=c('100','50','0'))+
-  scale_fill_grey(start = 0.5, end = .9)+
-  labs(y = ' ')+
-  theme(legend.position = 'none',
-        axis.title.x = element_blank(),
-        axis.text.x = element_blank(),
-        strip.text.x = element_blank(),
-        legend.title = element_blank(),
-        panel.spacing.y = unit(13, "lines")
-  )
-ggsave("../../figures/experiment_2_graphs.pdf",width=14,height=16)
-# EXP2: Plot Results - Paper Figure (Sideways Box Plot) --------------------------------------------------------------------
-
-df.plot = df.long %>%
-  left_join(df.predictions) %>%
-  mutate(clip = as.factor(clip))
-
-ggplot(df.plot,aes(x=condition,y=rating,fill=condition))+
-  geom_boxplot(width = .7, guides = FALSE, outlier.shape = NA, alpha = 0.5) +
-  geom_point(aes(y = rating), position = position_jitter(width=0.15),size = 1.3, alpha = 0.8) +
-  geom_point(aes(x=c('moral'),y=moral_model_prediction),color='black',fill='light grey',shape=24,size=6)+ # Model effort prediction
-  geom_point(aes(x=c('effort'),y=effort_model_prediction),color='black',shape=24,size=6)+
-  facet_wrap(~(-1*moral_mean),ncol=4)+
-  scale_y_continuous(limits=c(0, 1),breaks=c(1,.5,0),labels=c('100','50','0'))+
-  scale_fill_grey(start = 0.5, end = .9)+
-  labs(y = ' ')+
-  coord_flip()+
-  theme(legend.position = 'none',
-        axis.title.x = element_blank(),
-        # axis.text.x = element_blank(),
-        strip.text.x = element_blank(),
-        legend.title = element_blank(),
-        panel.spacing.y = unit(13, "lines")
-  )
-ggsave("../../figures/experiment_2_sideways_graphs.pdf",width=14,height=16)
+ggsave("../../figures/experiment_2_main_results.pdf",width=14,height=16)
 
 # ~~~~~~~~~~~~~ -------------------------------------------------------------------------------
