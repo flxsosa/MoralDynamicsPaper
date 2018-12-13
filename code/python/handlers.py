@@ -9,14 +9,16 @@ import pygame
 import pymunk
 from pygame.locals import *
 
-collision = []
 PF_COLLISION = []
-totalImpulse = []
 
 def rem0(arbiter, space, data):
 	'''
 	Used with post_solve. Removes the Green Agent after colliding with 
 	the Fireball. Expected that Green Agent is in space.shapes[1].
+
+	arbiter -- Pymunk collision arbiter
+	space   -- Pymunk space in which simulations are run
+	data    -- Pymunk collision data
 	'''
 	if PF_COLLISION:
 		return True

@@ -53,8 +53,6 @@ class Environment:
 		self.coll_handlers = [x for x in handlers] if handlers else handlers
 		# Values needed for rendering the scenario in Blender
 		self.tick = 0
-		self.counter_tick = [self.tick,counter_tick]
-		self.noise = noise
 		self.agent_collision = None
 		self.patient_fireball_collision = 0
 		self.position_dict = {
@@ -89,6 +87,7 @@ class Environment:
 		self.space.add(self.agent.body, self.agent.shape,
 					   self.patient.body, self.patient.shape,
 					   self.fireball.body, self.fireball.shape)
+		
 	def update_blender_values(self):
 		'''
 		All scenarios are rendered in the physics engine Blender. In order to do this,
@@ -108,7 +107,7 @@ class Environment:
 		# Increment the simulation tick
 		self.tick += 1
 		# Record when the Agent collides with someone else
-		if not handlers.A_COLLISION: self.agent_collision = self.tick
+		if not handlers.PF_COLLISION: self.agent_collision = self.tick
 
 	def run(self):
 		'''
@@ -127,7 +126,7 @@ class Environment:
 		# Running flag
 		running = True
 		# Main loop. Run simulation until collision between Green Agent 
-		# and Fireball
+		# 	and Fireball
 		while running and not handlers.PF_COLLISION:
 			try:
 				# Generate the next tick in the simulation for each object

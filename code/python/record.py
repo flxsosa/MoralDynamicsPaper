@@ -20,17 +20,17 @@ exp2_scenarios = []
 # Run scenarios and record the effort values from the Blue agent
 for scenario_name in scenarios.__experiment1__:
 	scenario = getattr(scenarios, scenario_name)
-	exp1_effort_values.append(scenario(False)) # Flip this to True to view
+	exp1_effort_values.append(scenario(False).agent.effort_expended) # Flip this to True to view
 	exp1_scenarios.append(scenario.__name__)
 
 # Run scenarios and record the effort values from the Blue agent
 for scenario_name in scenarios.__experiment2__:
 	scenario = getattr(scenarios, scenario_name)
-	exp2_effort_values.append(scenario(False)) # Flip this to True to view
+	exp2_effort_values.append(scenario(False).agent.effort_expended) # Flip this to True to view
 	exp2_scenarios.append(scenario.__name__)
 
 # Write scenario results (effort values for Blue agent) from scenarios in 
-# experiment 1 to a CSV file
+# 	experiment 1 to a CSV file
 exp1_results_csv = open('../../data/model/experimenta.csv','w')
 keys = exp1_scenarios
 writer = csv.DictWriter(exp1_results_csv, fieldnames = ['scenario', 'effort'])
@@ -43,7 +43,7 @@ for i in range(len(exp1_scenarios)):
 exp1_results_csv.close()
 
 # Write scenario results (effort values for Blue agent) from scenarios in 
-# experiment 2 to a CSV file
+# 	experiment 2 to a CSV file
 exp2_results_csv = open('../../data/model/experimentb.csv','w')
 keys = exp2_scenarios
 writer = csv.DictWriter(exp2_results_csv, fieldnames = ['scenario', 'effort'])
