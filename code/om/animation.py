@@ -1,3 +1,10 @@
+'''
+This is the python script that converts a JSON of a scenario
+into a Blender animation.
+
+Felix Sosa
+'''
+
 import os
 import bpy
 import json
