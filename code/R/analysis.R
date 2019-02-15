@@ -266,7 +266,7 @@ dbDisconnect(con)
 # Filter out incomplete trials by users
 df.data = df.data %>% 
   filter(status %in% 3:5) %>% 
-  filter(!str_detect(uniqueid,'debug')) %>%
+  # filter(!str_detect(uniqueid,'debug')) %>%
   filter(codeversion %in% c('experiment_7'))
 
 # Grab demographic data 
@@ -453,7 +453,7 @@ ci
 # EXP2: Plot Results - Mean Judgments (Scatterplot) --------------------------------------------------------------------
 
 # Dataframe for scatterplot of mean moral judgments by mean effort judgments
-df.plot = df.predictions %>%
+df.plot = df.predictions[order(-df.predictions$moral_mean),] %>%
   mutate(index = 1:nrow(.))
 
 # Generate scatterplot
@@ -462,23 +462,24 @@ ggplot(df.plot,aes(x=effort_mean,y=moral_mean))+
   geom_smooth(method=lm,color='black')+
   geom_errorbar(aes(ymin = moral_low, ymax = moral_high),width=0)+
   geom_errorbarh(aes(xmin = effort_low, xmax = effort_high),width=0)+
-  geom_point(size=12, color='green')+
+  geom_point(size=12, color='black')+
   geom_label_repel(aes(label = index),size=22,
                    box.padding = 1.2, point.padding = 1,
-                   na.rm=TRUE)+
+                   na.rm=TRUE,
+                   segment.color = 'grey')+
   coord_cartesian(xlim=c(0,1),ylim=c(0,1))+
   scale_x_continuous(breaks = seq(0,1,.25),labels = seq(0,1,.25))+
   scale_y_continuous(breaks = seq(0,1,.25),labels = seq(0,1,.25))+
-  labs(y = 'Mean Moral Judgments', x = 'Mean Effort Judgments')+
+  labs(y = 'Moral judgments (people)', x = 'Effort judgments (people)')+
   theme(axis.text=element_text(size=50),
         axis.title=element_text(size=70))
-ggsave("../../figures/experiment_2_moral_effort_scatter.pdf",width=18,height=15)
+ggsave("../../figures/experiment_2_moral_effort_scatter_figure.pdf",width=18,height=15)
 
 #+ EXP2: Plot Results - Moral Judgments Against Model (Scatterplot)
 # EXP2: Plot Results - Moral Judgments Against Model (Scatterplot) --------------------------------------------------------------------
 
 # Dataframe for scatterplot of mean moral judgments by mean effort judgments
-df.plot = df.predictions %>% 
+df.plot = df.predictions[order(-df.predictions$moral_mean),] %>%
   mutate(index = 1:nrow(.))
 
 # Generate scatterplot
@@ -486,23 +487,24 @@ ggplot(df.plot,aes(x=moral_model_prediction,y=moral_mean))+
   geom_abline(intercept = 0, slope = 1, linetype = 2)+
   geom_smooth(method=lm,color='black')+
   geom_errorbar(aes(ymin = moral_low, ymax = moral_high),width=0)+
-  geom_point(size=12,color='blue')+
+  geom_point(size=12,color='black')+
   geom_label_repel(aes(label = index),size=22,
                    box.padding = 1.2, point.padding = 1,
-                   na.rm=TRUE)+
-  coord_cartesian(xlim=c(0,1),ylim=c(0,1))+
-  scale_x_continuous(breaks = seq(0,1,.25),labels = seq(0,1,.25))+
-  scale_y_continuous(breaks = seq(0,1,.25),labels = seq(0,1,.25))+
-  labs(x = 'Model Moral Predictions', y = 'Mean Moral Judgments')+
+                   na.rm=TRUE,
+                   segment.color = 'grey')+
+  coord_cartesian(xlim=c(0.5,1),ylim=c(0.25,1))+
+  scale_x_continuous(breaks = seq(0.5,1,.25),labels = seq(0.5,1,.25))+
+  scale_y_continuous(breaks = seq(0.25,1,.25),labels = seq(0.25,1,.25))+
+  labs(x = 'Moral judgments (model)', y = 'Moral judgments (people)')+
   theme(axis.text=element_text(size=50),
         axis.title=element_text(size=70))
-ggsave("../../figures/experiment_2_moral_model_scatter.pdf",width=18,height=15)
+ggsave("../../figures/experiment_2_moral_model_scatter_figure.pdf",width=18,height=15)
 
 #+ EXP2: Plot Results - Effort Judgments Against Model (Scatterplot)
 # EXP2: Plot Results - Effort Judgments Against Model (Scatterplot) --------------------------------------------------------------------
 
 # Dataframe for scatterplot of mean moral judgments by mean effort judgments
-df.plot = df.predictions %>% 
+df.plot = df.predictions[order(-df.predictions$moral_mean),] %>%
   mutate(index = 1:nrow(.))
 
 # Generate scatterplot
@@ -510,17 +512,18 @@ ggplot(df.plot,aes(x=effort_model_prediction,y=effort_mean))+
   geom_abline(intercept = 0, slope = 1, linetype = 2)+
   geom_smooth(method=lm,color='black')+
   geom_errorbar(aes(ymin = effort_low, ymax = effort_high),width=0)+
-  geom_point(size=12,color='red')+
+  geom_point(size=12,color='black')+
   geom_label_repel(aes(label = index),size=22,
                    box.padding = 1.2, point.padding = 1,
-                   na.rm=TRUE)+
+                   na.rm=TRUE,
+                   segment.color = 'grey')+
   coord_cartesian(xlim=c(0,1),ylim=c(0,1))+
   scale_x_continuous(breaks = seq(0,1,.25),labels = seq(0,1,.25))+
   scale_y_continuous(breaks = seq(0,1,.25),labels = seq(0,1,.25))+
-  labs(x = 'Model Effort Predictions', y = 'Mean Effort Judgments')+
+  labs(x = 'Effort judgments (model)', y = 'Effort judgments (people)')+
   theme(axis.text=element_text(size=50),
         axis.title=element_text(size=70))
-ggsave("../../figures/experiment_2_effort_model_scatter.pdf",width=18,height=15)
+ggsave("../../figures/experiment_2_effort_model_scatter_figure.pdf",width=18,height=15)
 
 #+ results = 'hide'
 # EXP2: Plot Results - Main Results (Bar Graph) --------------------------------------------------------------------
@@ -534,10 +537,10 @@ df.plot = df.long %>%
 #   figures/experiment_2_figure.ai
 ggplot(df.plot,aes(x=condition,y=rating,fill=condition))+
   stat_summary(fun.y = mean, geom = 'bar', color = 'black')+
-  geom_point(aes(y = rating), position = position_jitter(width=0.15),size = 1.3, alpha = 0.5) +
-  geom_point(aes(x=c('moral'),y=moral_model_prediction),color='black',fill='light grey',shape=21,size=6)+ # Model effort prediction
-  geom_point(aes(x=c('effort'),y=effort_model_prediction),color='black',shape=21,size=6)+
   stat_summary(fun.data = mean_cl_boot, geom = 'errorbar', width = 0, color = 'black')+
+  geom_point(aes(y = rating), position = position_jitter(width=0.15),size = 1.3, alpha = 0.5) +
+  geom_point(aes(x=c('moral'),y=moral_model_prediction),color='black',fill='light grey',shape=21,size=8)+ # Model effort prediction
+  geom_point(aes(x=c('effort'),y=effort_model_prediction),color='black',shape=21,size=8)+
   facet_wrap(~(-1*moral_mean),ncol=6)+
   scale_y_continuous(limits=c(0, 1.1),breaks=c(1,.5,0),labels=c('100','50','0'))+
   scale_fill_grey(start = 0.5, end = .9)+
