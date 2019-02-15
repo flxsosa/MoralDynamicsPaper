@@ -2,11 +2,19 @@
 #' title: Moral Dynamics Analysis File
 #' author: Felix A Sosa
 #' date: December, 13, 2018
+#' output:
+#'    html_document:
+#'      toc: true
+#'      toc_depth: 3
+#'      toc_float: true
+#'      theme: default
+#'      highlight: tango
+#'      fig.width: 10
+#'      fig.height: 6
 #' ---
 
-#+ Load Packages
-# Load packages  ------------------------------------------------------------------------------
-
+#+ Load packages  ------------------------------------------------------------------------------
+#' # Load Packages
 library(scales)
 library(Hmisc)
 library(tidyjson)
@@ -23,9 +31,8 @@ rm(list = ls())
 #+ General settings, echo = FALSE, results = 'hide'
 knitr::opts_chunk$set(fig.width=10, fig.height=6, warning=FALSE, message=FALSE)
 
-#+ Helper Functions
-# Helper functions and variables ----------------------------------------------------------------------------
-
+#+ Helper functions and variables ----------------------------------------------------------------------------
+#' # Helper Functions and Variables
 # Set ggplot theme 
 theme_set(
   theme_bw()+
@@ -88,10 +95,10 @@ clips_in_experiment_1 <- c(1,3,4,7,8,9,10,11,12)
 # Experiment 1 clip number to name mapping
 clip_number_name_map_mk = c(3,7,12,4,1,9,10,11,8)
 
-# ~~~~~~~~~~~~~ -------------------------------------------------------------------------------
-#+ EXP1:Read in and Structure Data
-# EXP1: Read in and Structure Data ------------------------------------------------------------------
-
+#+ ~~~~~~~~~~~~~ -------------------------------------------------------------------------------
+#+ EXP1: Read in and Structure Data ------------------------------------------------------------------
+#' # Experiment 1
+#' ## Read in and Structure Data
 # Connect to database file and collect data
 con = dbConnect(SQLite(),dbname = "../../data/empirical/experiment1_anonymized.db");
 df.data = dbReadTable(con,"moral_dynamics")
@@ -149,43 +156,9 @@ df.exp1_eff_val = read.csv("../../data/model/experiment1.csv") %>%
   filter(clip != 'scenario') %>% # Filter out headers from csv file
   filter(clip %in% clips_in_experiment_1)
 
-#+ EXP1: Temperature Fitting
-# EXP1: Temperature Fitting --------------------------------------------------------------------
 
-# Empirical data
-df.empirical_data = df.long %>%
-  group_by(clips) %>%
-  mutate(rating = ifelse(rating<=3,1,0)) %>%
-  summarise(rating = mean(rating)) %>%
-  ungroup()
-
-# Data to be passed
-df.data = df.long %>% 
-  mutate(clip_pairs = clips) %>%
-  group_by(clips) %>% 
-  summarise(rating = mean(rating)) %>% 
-  ungroup() %>% 
-  mutate(videos = clips) %>%
-  separate(clips,into = c('clip1','clip2'),sep="_") %>%
-  mutate_at(vars(contains('clip')),funs(as.numeric(.))) %>% 
-  left_join(df.exp1_eff_val %>% 
-              select(clip,effort), by = c("clip1" = "clip")) %>%
-  left_join(df.exp1_eff_val %>% 
-              select(clip,effort), by = c("clip2" = "clip")) %>%
-  mutate(e1 = effort.x/max(effort.x)) %>%
-  mutate(e2 = effort.y/max(effort.x)) %>%
-  mutate(clips = paste(clip1,clip2,sep="_")) %>%
-  left_join(df.empirical_data, by='clips') %>%
-  mutate(rating = rating.y) %>%
-  select('e1','e2','rating','clips')
-
-# Temperature values for either softmax or parameterized LCA
-temperature = optim(par = 0, fn = softmax.RSS, data = df.data, method='Brent',lower=-100,upper=100)$par
-temperature = optim(par = 0, fn = lca_temp.RSS, data = df.data, method='Brent',lower=-100,upper=100)$par
-
-#+ EXP1: Model Predictions
-# EXP1: Model Predictions  --------------------------------------------------------------------
-
+#+ EXP1: Model Predictions  --------------------------------------------------------------------
+#' ## Model Predictions
 # Dataframe containing softmax predictions of moral judgment
 df.predictions = df.long %>% 
   mutate(clip_pairs = clips) %>%
@@ -209,9 +182,9 @@ df.predictions = df.long %>%
          rating = lca) %>%
   select('clips','rating','rating.low','rating.high','index')
 
-#+ EXP1: Plot Results - Main Results (Bar Graph)
-# EXP1: Plot Results - Main Results (Bar Graph)  -----------------------------------------------------
 
+#+ EXP1: Plot: Main Results (Bar Graph)  -----------------------------------------------------
+#' ## Plot: Main Results
 # Dataframe for bar graph of mean moral judgments across videos
 df.plot = df.long %>% 
   mutate(rating = ifelse(rating <= 3,1,0)) %>% 
@@ -256,10 +229,10 @@ for(i in c(1:9)){
   ggsave(paste("../../figures/plots/experiment_1/experiment_1_bar_graph_",toString(toString(df.plot[i,]$clips)),".pdf"),width=8,height=4)
 }
 
-# ~~~~~~~~~~~~~ -------------------------------------------------------------------------------
-#+ EXP2: Read in and Structure Data
-# EXP2: Read in and Structure Data ------------------------------------------------------------------
-
+#+ ~~~~~~~~~~~~~ -------------------------------------------------------------------------------
+#+ EXP2: Read in and Structure Data ------------------------------------------------------------------
+#' # Experiment 2
+#' ## Read in and Structure Data
 # Connect to database file and collect data
 con = dbConnect(SQLite(),dbname = "../../data/empirical/experiment2_anonymized.db");
 df.data = dbReadTable(con,"moral_dynamics")
@@ -300,9 +273,8 @@ df.long = df.data$datastring %>% # Grab datastring
          rating = rescale(rating, to=c(0,1))) %>% 
   arrange(participant)
 
-#+ EXP2: Model Predictions
-# EXP2: Model Predictions ------------------------------------------------------------------
-
+#+ EXP2: Model Predictions ------------------------------------------------------------------
+#' ## Model Predictions
 # Effort predictions from Moral Dyanmics model 
 df.exp2_eff_val = read.csv("../../data/model/experiment2.csv")
 
@@ -325,9 +297,8 @@ df.predictions = df.long %>%
          moral_empirical_prediction = lm(moral_mean~effort_mean,data=.)$fitted.values, # Prediction of moral judgments using effort judgments
          moral_model_prediction = lm(moral_mean~effort,data=.)$fitted.values) # Model prediction of moral judgments
 
-#+ EXP2: Spearman Correlations
 # EXP2: Spearman Correlations ------------------------------------------------------------------
-
+#' ## Spearman Correlations
 # Statistical summaries 
 # Correlate model predictions with moral judgments
 cor.test(df.predictions$moral_model_prediction, df.predictions$moral_mean, method='spearman')
@@ -338,9 +309,8 @@ cor.test(df.predictions$effort_model_prediction, df.predictions$effort_mean, met
 # Correlate effort judgment with moral judgments
 cor.test(df.predictions$moral_empirical_prediction, df.predictions$moral_mean, method='spearman')
 
-#+ EXP2: Bootstrapped Confidence Intervals Model vs Moral Mean
-# EXP2: Bootstrapped Confidence Intervals Model vs Moral Mean ------------------------------------------------------------------
-
+#+ EXP2: Bootstrapped Confidence Intervals Model vs Moral Mean ------------------------------------------------------------------
+#' ## CI on Model Predictions vs Empirical Moral Judgments
 # Statistic function
 statistic_func <- function(original_dataset, d) {
   # Gather sampled_dataset
@@ -376,9 +346,8 @@ ci = boot.ci(b,conf=.95)
 # Print out summary of ci
 ci
 
-#+ EXP2: Bootstrapped Confidence Intervals Model vs Effort Mean
-# EXP2: Bootstrapped Confidence Intervals Model vs Effort Mean ------------------------------------------------------------------
-
+#+ EXP2: Bootstrapped Confidence Intervals Model vs Effort Mean ------------------------------------------------------------------
+#' ## CI on Model Predictions vs Empirical Effort Judgments
 # Statistic function
 statistic_func <- function(original_dataset, d) {
   # Gather sampled_dataset
@@ -414,9 +383,8 @@ ci = boot.ci(b,conf=.95)
 # Print out summary of ci
 ci
 
-#+ EXP2: Bootstrapped Confidence Intervals Effort Mean vs Moral Mean
-# EXP2: Bootstrapped Confidence Intervals Effort Mean vs Moral Mean ------------------------------------------------------------------
-
+#+ EXP2: Bootstrapped Confidence Intervals Effort Mean vs Moral Mean ------------------------------------------------------------------
+#' ## CI on Empirical Effort Judgments vs Empirical Moral Judgments
 # Statistic function
 statistic_func <- function(original_dataset, d) {
   # Gather sampled_dataset
@@ -451,9 +419,8 @@ ci = boot.ci(b,conf=.95)
 # Print out summary of ci
 ci
 
-#+ EXP2: Plot Results - Mean Judgments (Scatterplot)
-# EXP2: Plot Results - Mean Judgments (Scatterplot) --------------------------------------------------------------------
-
+#+ EXP2: Plot: Mean Judgments (Scatterplot) --------------------------------------------------------------------
+#' ## Plot: Moral Judgments Against Effort Judgments
 # Dataframe for scatterplot of mean moral judgments by mean effort judgments
 df.plot = df.predictions[order(-df.predictions$moral_mean),] %>%
   mutate(index = 1:nrow(.))
@@ -477,9 +444,8 @@ ggplot(df.plot,aes(x=effort_mean,y=moral_mean))+
         axis.title=element_text(size=70))
 ggsave("../../figures/experiment_2_moral_effort_scatter_figure.pdf",width=18,height=15)
 
-#+ EXP2: Plot Results - Moral Judgments Against Model (Scatterplot)
-# EXP2: Plot Results - Moral Judgments Against Model (Scatterplot) --------------------------------------------------------------------
-
+#+ EXP2: Plot: Moral Judgments Against Model (Scatterplot) --------------------------------------------------------------------
+#' ## Plot: Moral Judgments Against Model Predictions
 # Dataframe for scatterplot of mean moral judgments by mean effort judgments
 df.plot = df.predictions[order(-df.predictions$moral_mean),] %>%
   mutate(index = 1:nrow(.))
@@ -502,9 +468,8 @@ ggplot(df.plot,aes(x=moral_model_prediction,y=moral_mean))+
         axis.title=element_text(size=70))
 ggsave("../../figures/experiment_2_moral_model_scatter_figure.pdf",width=18,height=15)
 
-#+ EXP2: Plot Results - Effort Judgments Against Model (Scatterplot)
-# EXP2: Plot Results - Effort Judgments Against Model (Scatterplot) --------------------------------------------------------------------
-
+#+ EXP2: Plot: Effort Judgments Against Model (Scatterplot) --------------------------------------------------------------------
+#' ## Plot: Effort Judgments Against Model Predictions
 # Dataframe for scatterplot of mean moral judgments by mean effort judgments
 df.plot = df.predictions[order(-df.predictions$moral_mean),] %>%
   mutate(index = 1:nrow(.))
@@ -527,9 +492,9 @@ ggplot(df.plot,aes(x=effort_model_prediction,y=effort_mean))+
         axis.title=element_text(size=70))
 ggsave("../../figures/experiment_2_effort_model_scatter_figure.pdf",width=18,height=15)
 
-#+ results = 'hide'
-# EXP2: Plot Results - Main Results (Bar Graph) --------------------------------------------------------------------
 
+#+ EXP2: Plot: Main Results (Bar Graph) --------------------------------------------------------------------
+#' ## Plot: Main Results
 # Dataframe for bar graphs to be used in figure
 df.plot = df.long %>%
   left_join(df.predictions) %>%
