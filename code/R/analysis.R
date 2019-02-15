@@ -132,13 +132,15 @@ df.long = df.data$datastring %>%
   mutate(rating = as.numeric(rating),
          rating = ifelse(display == 'flipped', 7-rating, rating)) %>% 
   select(-c(display,`1`,`2`)) %>% 
-  mutate(participant = factor(participant,labels = 1:length(unique(participant))))
+  mutate(participant = factor(participant,labels = 1:length(unique(participant)))) %>%
+  mutate(clip = clips)
 
 # Create dataframe containing empirical results from "Moral Kinematics"
 df.kinematics = read.csv("../../data/empirical/moral_kinematics.csv") %>%
   # Only grab scenarios we can reconstruct (see paper)
   filter(left %in% clips_we_can_reconstruct) %>% # Should be clips_in_experiment_1
-  filter(right %in% clips_we_can_reconstruct) # Should be clips_in_experiment_1
+  filter(right %in% clips_we_can_reconstruct) %>% # Should be clips_in_experiment_1 
+  mutate(clip = clips)
 
 # Dataframe containing ground-truth effort values for each scenario
 df.exp1_eff_val = read.csv("../../data/model/experiment1.csv") %>%
