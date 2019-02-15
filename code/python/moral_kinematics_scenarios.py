@@ -2,6 +2,17 @@
 The set of scenarios from Moral Kinematics that were replicated for the Moral
 Dynamics project.
 
+Each function below defines a scenario. The block comments below the 
+function declaration detail the scenario:
+
+P = Patient
+A = Agent
+F = Fireball
+> = Moving Right
+< = Moving Left
+^ = Moving Up
+- = Empty Space
+
 Felix Sosa
 '''
 from environment import Environment
