@@ -375,7 +375,7 @@ effort_dataset$participant <- effort_dataset %>%
   group_indices(effort_dataset$participant)
 
 # Make boot object
-b = boot(effort_dataset, statistic_func, R=1000)
+b = boot(effort_dataset, statistic_func, R=2000)
 
 # Gather ci for correlations
 ci = boot.ci(b,conf=.95)
