@@ -18,20 +18,22 @@ Felix Sosa
 from environment import Environment
 from handlers import rem0
 
+__test__ = ["long_distance"]
+
 # Scenarios used in experiment 1 (see paper)
 __experiment1__ = ["long_distance","dodge","bystander","stays_put",
-		 		   "short_distance","med_push","long_push","push_patient", 
-				   "double_push"]
+			"short_distance","med_push","long_push","push_patient",
+			"double_push"]
 
 # Scenarios used in experiment 2 (see paper)
 __experiment2__ = ["long_distance","dodge","bystander","stays_put",
-				   "short_distance","med_push","long_push","push_patient", 
-				   "double_push","harm_moving_moving","harm_moving_static",
-  				   "harm_static_moving","harm_static_static",
-  				   "victim_moving_moving","victim_moving_static",
-  				   "victim_static_moving","victim_static_static"]
+			"short_distance","med_push","long_push","push_patient", 
+			"double_push","harm_moving_moving","harm_moving_static",
+			"harm_static_moving","harm_static_static",
+			"victim_moving_moving","victim_moving_static",
+			"victim_static_moving","victim_static_static"]
 
-def long_distance(view=True):
+def long_distance(view=True,std_dev=0):
 	# - - - - - - -
 	# A > > > P - F
 	# - - - - - - -
@@ -56,11 +58,11 @@ def long_distance(view=True):
 	handlers =[(1,2,rem0)]
 	# Agent velocities
 	vel = 300,150,150
-	env = Environment(a_params,p_params,f_params,vel,handlers,view)
+	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
 	env.run()
 	return env
 
-def dodge(view=True):
+def dodge(view=True,std_dev=0):
 	# - - - ^ - - -
 	# P > > A - - F
 	# - - - - - - -
@@ -85,11 +87,11 @@ def dodge(view=True):
 	handlers =[(1,2,rem0)]
 	# Agent velocities
 	vel = 300,300,300
-	env = Environment(a_params,p_params,f_params,vel,handlers,view)
+	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
 	env.run()
 	return env
 
-def bystander(view=True):
+def bystander(view=True,std_dev=0):
 	# - - - A - - -
 	# P > > > > > F
 	# - - - - - - -
@@ -118,7 +120,7 @@ def bystander(view=True):
 	env.run()
 	return env
 
-def stays_put(view=True):
+def stays_put(view=True,std_dev=0):
 	# - - - - P - -
 	# F > > A - - -
 	# - - - - - - -
@@ -147,7 +149,7 @@ def stays_put(view=True):
 	env.run()
 	return env
 
-def short_distance(view=True):
+def short_distance(view=True,std_dev=0):
 	# - - - - - - -
 	# - - A > P - F
 	# - - - - - - -
@@ -176,7 +178,7 @@ def short_distance(view=True):
 	env.run()
 	return env
 
-def med_push(view=True):
+def med_push(view=True,std_dev=0):
 	# - - - - - - -
 	# A > > P - - F
 	# - - - - - - -
@@ -205,7 +207,7 @@ def med_push(view=True):
 	env.run()
 	return env
 
-def long_push(view=True):
+def long_push(view=True,std_dev=0):
 	# - - - - - - -
 	# A P > > > > F
 	# - - - - - - -
@@ -234,7 +236,7 @@ def long_push(view=True):
 	env.run()
 	return env
 
-def push_patient(view=True):
+def push_patient(view=True,std_dev=0):
 	# Test two types of agents, good and bad in the scenario
 	# - F - - - - -
 	# - - - ^ < < P
@@ -264,7 +266,7 @@ def push_patient(view=True):
 	env.run()
 	return env
 
-def double_push(view=True):
+def double_push(view=True,std_dev=0):
 	# - - - - - - -
 	# A P > - > - F
 	# - - - - - - -
@@ -293,7 +295,7 @@ def double_push(view=True):
 	env.run()
 	return env
 
-def harm_moving_moving(view=True):
+def harm_moving_moving(view=True,std_dev=0):
 	# Test two types of agents, good and bad in the scenario
 	# > > P - - - -
 	# - - - < < < F
@@ -326,7 +328,7 @@ def harm_moving_moving(view=True):
 	env.run()
 	return env
 
-def victim_moving_moving(view=True):
+def victim_moving_moving(view=True,std_dev=0):
 	# Test two types of agents, good and bad in the scenario
 	# > > F - - - -
 	# - - - < < < P
@@ -359,7 +361,7 @@ def victim_moving_moving(view=True):
 	env.run()
 	return env
 
-def harm_moving_static(view=True):
+def harm_moving_static(view=True,std_dev=0):
 	# Test two types of agents, good and bad in the scenario
 	# - P - - - - -
 	# - - - < < < F
@@ -391,7 +393,7 @@ def harm_moving_static(view=True):
 	env.run()
 	return env
 
-def victim_moving_static(view=True):
+def victim_moving_static(view=True,std_dev=0):
 	# Test two types of agents, good and bad in the scenario
 	# - F - - - - -
 	# - - - < < < P
@@ -424,7 +426,7 @@ def victim_moving_static(view=True):
 	env.run()
 	return env
 
-def harm_static_moving(view=True):
+def harm_static_moving(view=True,std_dev=0):
 	# Test two types of agents, good and bad in the scenario
 	# - - - < < < P
 	# - - - F - - -
@@ -454,7 +456,7 @@ def harm_static_moving(view=True):
 	env.run()
 	return env
 
-def victim_static_moving(view=True):
+def victim_static_moving(view=True,std_dev=0):
 	# Test two types of agents, good and bad in the scenario
 	# - - - < < < F
 	# - - - P - - -
@@ -484,7 +486,7 @@ def victim_static_moving(view=True):
 	env.run()
 	return env
 
-def harm_static_static(view=True):
+def harm_static_static(view=True,std_dev=0):
 	# - - - - - - -
 	# A > > F - - P
 	# - - - - - - -
@@ -513,7 +515,7 @@ def harm_static_static(view=True):
 	env.run()
 	return env
 
-def victim_static_static(view=True):
+def victim_static_static(view=True,std_dev=0):
 	# - - - - - - -
 	# A > > P - - F
 	# - - - - - - -
@@ -541,3 +543,33 @@ def victim_static_static(view=True):
 	env = Environment(a_params,p_params,f_params,vel,handlers,view)
 	env.run()
 	return env
+
+def bot_check(view=True,std_dev=0):
+	# - - - - - - -
+	# A > > P - - F
+	# - - - - - - -
+	a_params, p_params, f_params = {}, {}, {}
+	# Agent parameters
+	a_params['loc'] = (100,100)
+	a_params['color'] = "blue"
+	a_params['moves'] = ['N','N','N','N','N']
+	a_params['coll'] = 0
+	a_params['type'] = 'B'
+	# Patient parameters
+	p_params['loc'] = (900,500)
+	p_params['color'] = "green"
+	p_params['moves'] = ['N','N','N','N','N']
+	p_params['coll'] = 1
+	# Fireball parameters
+	f_params['loc'] = (900,100)
+	f_params['color'] = "red"
+	f_params['moves'] = ['U','U','U','N','N']
+	f_params['coll'] = 2
+	# Collision handlers
+	handlers =[(1,2,rem0)]
+	# Agent velocities
+	vel = 300,300,300
+	env = Environment(a_params,p_params,f_params,vel,handlers,view)
+	env.run()
+	return env
+
