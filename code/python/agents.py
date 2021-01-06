@@ -7,6 +7,7 @@ Felix Sosa
 import pymunk
 import pygame
 import glob
+from random import gauss
 # Distance agents move per action
 move_lat_distance = 160
 move_long_distance = 160
@@ -51,7 +52,7 @@ class Agent:
 		self.actions = [self.action_dict[x] for x in moves]
 
 	# Action definitions
-	def move_right(self, velocity, clock, screen, space, options, view):
+	def move_right(self, velocity, clock, screen, space, options, view, std_dev=0):
 		# Move agent right
 		intended_x_pos = self.body.position[0]+move_lat_distance
 		while self.body.position[0] < intended_x_pos:
@@ -59,12 +60,13 @@ class Agent:
 				for event in pygame.event.get():
 					pass
 			if self.body.velocity[0] < velocity:
-				imp = velocity - self.body.velocity[0]
-				self.body.apply_impulse_at_local_point((imp,0))
-				self.effort_expended += imp
+				impx = gauss(velocity - self.body.velocity[0], std_dev)
+				impy = gauss(0,std_dev)
+				self.body.apply_impulse_at_local_point((impx,impy))
+				self.effort_expended += (impx**2+impy**2)**0.5
 			yield
 
-	def move_left(self, velocity, clock, screen, space, options, view):
+	def move_left(self, velocity, clock, screen, space, options, view, std_dev=0):
 		# Move agent left
 		intended_x_pos = self.body.position[0]-move_lat_distance
 		while self.body.position[0] > intended_x_pos:
@@ -72,12 +74,14 @@ class Agent:
 				for event in pygame.event.get():
 					pass
 			if abs(self.body.velocity[0]) < velocity:
-				imp = velocity - abs(self.body.velocity[0])
-				self.body.apply_impulse_at_local_point((-1*imp,0))
-				self.effort_expended += imp
+				print(std_dev)
+				impx = gauss(velocity - abs(self.body.velocity[0]), std_dev)
+				impy = gauss(0,std_dev)
+				self.body.apply_impulse_at_local_point((-1*impx,impy))
+				self.effort_expended += (impx**2+impy**2)**0.5
 			yield
 
-	def move_up(self, velocity, clock, screen, space, options, view):
+	def move_up(self, velocity, clock, screen, space, options, view, std_dev=0):
 		# Move agent up
 		intended_y_pos = self.body.position[1]+move_long_distance
 		while self.body.position[1] < intended_y_pos:
@@ -85,12 +89,14 @@ class Agent:
 				for event in pygame.event.get():
 					pass
 			if self.body.velocity[1] < velocity:
+				impy = gauss(velocity - self.body.velocity[1], std_dev)
+				impx = gauss(0,std_dev)
 				imp = velocity - self.body.velocity[1]
-				self.body.apply_impulse_at_local_point((0,imp))
-				self.effort_expended += imp
+				self.body.apply_impulse_at_local_point((impx,impy))
+				self.effort_expended += (impx**2+impy**2)**0.5
 			yield
 
-	def move_down(self, velocity, clock, screen, space, options, view):
+	def move_down(self, velocity, clock, screen, space, options, view, std_dev=0):
 		# Move agent up
 		intended_y_pos = self.body.position[1]-move_long_distance
 		while self.body.position[1] > intended_y_pos:
@@ -98,12 +104,13 @@ class Agent:
 				for event in pygame.event.get():
 					pass
 			if abs(self.body.velocity[1]) < velocity:
-				imp = velocity - abs(self.body.velocity[1])
-				self.body.apply_impulse_at_local_point((0,-1*imp))
-				self.effort_expended += imp
+				impy = gauss(velocity - abs(self.body.velocity[1]), std_dev)
+				impx = gauss(0,std_dev)
+				self.body.apply_impulse_at_local_point((impx,-1*impy))
+				self.effort_expended += (impx**2+impy**2)**0.5
 			yield
 
-	def stay_put(self, velocity, clock, screen, space, options, view):
+	def stay_put(self, velocity, clock, screen, space, options, view, std_dev=0):
 		# Agent stays put. This is different from do_nothing in that the 
 		# 	agent will apply a force to maintain its current location if 
 		# 	pushed or pulled in some direction.
@@ -121,7 +128,7 @@ class Agent:
 				self.effort_expended += abs(imp)
 			yield
 
-	def move_right_special(self,velocity,clock,screen,space,options,view):
+	def move_right_special(self,velocity,clock,screen,space,options,view,std_dev=0):
 		# Move agent right (special case for replicating scenarios in 
 		# 	Moral Kinematics)
 		tick = 0
@@ -132,12 +139,13 @@ class Agent:
 					pass
 			tick += 1
 			if self.body.velocity[0] < velocity:
-				imp = velocity - self.body.velocity[0]
-				self.body.apply_impulse_at_local_point((imp,0))
-				self.effort_expended += abs(imp)
+				impx = gauss(velocity - abs(self.body.velocity[0]), std_dev)
+				impy = gauss(0,std_dev)
+				self.body.apply_impulse_at_local_point((impx,impy))
+				self.effort_expended += (impx**2+impy**2)**0.5
 			yield
 
-	def move_down_special(self,velocity,clock,screen,space,options,view,t=None,n=None):
+	def move_down_special(self,velocity,clock,screen,space,options,view,std_dev=0):
 		# Move agent down (special case for replicating scenarios in 
 		# 	Moral Kinematics)
 		intended_y_pos = self.body.position[1]-move_long_distance/3.0
@@ -146,9 +154,10 @@ class Agent:
 				for event in pygame.event.get():
 					pass
 			if abs(self.body.velocity[1]) < velocity:
-				imp = velocity - abs(self.body.velocity[1])
-				self.body.apply_impulse_at_local_point((0,-1*imp))
-				self.effort_expended += abs(imp)
+				impy = gauss(velocity - abs(self.body.velocity[1]), std_dev)
+				impx = gauss(0,std_dev)
+				self.body.apply_impulse_at_local_point((impx,-1*impy))
+				self.effort_expended += (impx**2+impy**2)**0.5
 			yield
 		for _ in range(2*wait_period/3):
 			if view:
@@ -156,7 +165,7 @@ class Agent:
 					pass
 			yield
 
-	def move_down_special_2(self,velocity,clock,screen,space,options,view,t=None,n=None):
+	def move_down_special_2(self,velocity,clock,screen,space,options,view,std_dev=0):
 		# Move agent down (special case for replicating scenarios in 
 		# 	Moral Kinematics)
 		intended_y_pos = self.body.position[1]-move_long_distance/2.5
@@ -165,9 +174,10 @@ class Agent:
 				for event in pygame.event.get():
 					pass
 			if abs(self.body.velocity[1]) < velocity:
-				imp = velocity - abs(self.body.velocity[1])
-				self.body.apply_impulse_at_local_point((0,-1*imp))
-				self.effort_expended += abs(imp)
+				impy = gauss(velocity - abs(self.body.velocity[1]), std_dev)
+				impx = gauss(0,std_dev)
+				self.body.apply_impulse_at_local_point((impx,-1*impy))
+				self.effort_expended += (impx**2+impy**2)**0.5
 			yield
 		for _ in range(wait_period/2):
 			if view:
@@ -175,7 +185,7 @@ class Agent:
 					pass
 			yield
 	
-	def do_nothing(self,velocity,clock,screen,space,options,view,t=None,n=None):
+	def do_nothing(self,velocity,clock,screen,space,options,view,std_dev=0):
 		# Agent does nothing
 		for _ in range(wait_period):
 			if view:
@@ -183,7 +193,7 @@ class Agent:
 					pass
 			yield
 
-	def do_nothing_special(self,velocity,clock,screen,space,options,view,t=None,n=None):
+	def do_nothing_special(self,velocity,clock,screen,space,options,view,std_dev=0):
 		# Do nothing (special case for replicating scenarios in 
 		# Moral Kinematics)
 		for _ in range(wait_period+5):
@@ -192,7 +202,7 @@ class Agent:
 					pass
 			yield
 
-	def do_nothing_special_2(self,velocity,clock,screen,space,options,view,t=None,n=None):
+	def do_nothing_special_2(self,velocity,clock,screen,space,options,view,std_dev=0):
 		# Do nothing (special case for replicating scenarios in 
 		# 	Moral Kinematics)
 		for _ in range(wait_period+10):
@@ -201,14 +211,14 @@ class Agent:
 					pass
 			yield
 
-	def act(self, velocity, clock, screen, space, options, view):
+	def act(self, velocity, clock, screen, space, options, view, std_dev=0):
 		# Execute policy
 		actions = iter(self.actions)
 		actions_left = True
 		action = next(actions)
 		while actions_left:
 			try:
-				for _ in action(velocity, clock, screen, space, options, view):
+				for _ in action(velocity, clock, screen, space, options, view, std_dev):
 					yield
 				action = next(actions)
 			except:
