@@ -8,7 +8,7 @@ from moral_kinematics_scenarios import harm_moving_moving,harm_moving_static, \
 									victim_static_moving, victim_static_static, \
 									long_distance, dodge, bystander, stays_put, \
 									short_distance, med_push, long_push, \
-									push_patient, double_push
+									push_patient, double_push, bot_check
 
 moral_kinematics_scenarios = [harm_moving_moving,harm_moving_static,
 								harm_static_moving, harm_static_static,
@@ -16,7 +16,7 @@ moral_kinematics_scenarios = [harm_moving_moving,harm_moving_static,
 								victim_static_moving, victim_static_static,
 								long_distance, dodge, bystander, stays_put,
 								short_distance, med_push, long_push,
-								push_patient, double_push]
+								push_patient, double_push, bot_check]
 
 # Create list of lists of scenarios
 list_of_scenarios = [moral_kinematics_scenarios]
@@ -61,8 +61,9 @@ def convert(environment, path=""):
 	with open(path+config['name']+".json", "w") as j:
 		json.dump(sim_dict, j, indent=2)
 
-# Loop through all simulations and convert them into JSON
-for scenarios in list_of_scenarios:
-	scenario_type = names[0]
-	for scene in scenarios:
-		convert(scene, path)
+# # Loop through all simulations and convert them into JSON
+# for scenarios in list_of_scenarios:
+# 	scenario_type = names[0]
+# 	for scene in scenarios:
+# 		convert(scene, path)
+convert(moral_kinematics_scenarios[-1])
