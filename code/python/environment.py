@@ -106,8 +106,6 @@ class Environment:
 							'y':self.patient.body.position[1]})
 		self.position_dict['fireball'].append({'x':self.fireball.body.position[0], 
 							'y':self.fireball.body.position[1]})
-		# Increment the simulation tick
-		self.tick += 1
 		# Record when the Agent collides with someone else
 		if not handlers.PF_COLLISION: self.agent_collision = self.tick
 
@@ -144,6 +142,66 @@ class Environment:
 				self.space.step(1/50.0)
 				# Update the values for the Blender JSON file
 				self.update_blender_values()
+				# Increment the simulation tick
+				self.tick += 1
+			except:
+				running = False
+		if self.view:
+			pygame.quit()
+			pygame.display.quit()
+		# Record whether Green Agent and Fireball collision occurred
+		self.patient_fireball_collision = 1 if handlers.PF_COLLISION else 0
+		# Reset collision handler
+		handlers.PF_COLLISION = []
+
+	def counterfactual_run(self,std_dev,collision_tick):
+		'''
+		Forward method for Environments. Actually runs the scenarios you
+		view on (or off) screen.
+		'''
+		self.agent_collision = collision_tick
+		pygame.init()
+		self.screen = pygame.display.set_mode((1000,600))
+		self.options = pymunk.pygame_util.DrawOptions(self.screen)
+		self.clock = pygame.time.Clock()
+		self.space.remove(self.space.shapes[0])
+		self.space.remove(self.space.bodies[0])
+		self.std_dev = std_dev
+		# Agent velocities
+		_, p_vel, f_vel = self.vel
+		# Counterfactual ticks for agents
+		self.agent.counterfactual_tick = self.agent_collision
+		self.patient.counterfactual_tick = self.agent_collision
+		self.fireball.counterfactual_tick = self.agent_collision
+		# Agent action generators (yield actions of agents)
+		p_generator = self.patient.act(p_vel, self.clock, self.screen,
+						self.space, self.options, self.view, self.std_dev)
+		f_generator = self.fireball.act(f_vel, self.clock, self.screen,
+						self.space, self.options, self.view, self.std_dev)
+		# Running flag
+		running = True
+		# Main loop. Run simulation until collision between Green Agent
+		# 	and Fireball
+		while running and not handlers.PF_COLLISION:
+			try:
+				# Generate the next tick in the simulation for each object
+				next(p_generator)
+				next(f_generator)
+				# Render space on screen (if requested)
+				if self.view:
+					self.screen.fill((255,255,255))
+					self.space.debug_draw(self.options)
+					pygame.display.flip()
+					self.clock.tick(50)
+				self.space.step(1/50.0)
+				# Update the values for the Blender JSON file
+				self.update_blender_values()
+				# Increment the simulation tick
+				self.tick += 1
+				# Increment ticks in agents
+				self.agent.tick = self.tick
+				self.patient.tick = self.tick
+				self.fireball.tick = self.tick
 			except:
 				running = False
 		if self.view:
