@@ -18,7 +18,7 @@ Felix Sosa
 from environment import Environment
 from handlers import rem0
 
-__test__ = ["long_distance"]
+__test__ = [ "harm_moving_static"]
 
 # Scenarios used in experiment 1 (see paper)
 __experiment1__ = ["long_distance","dodge","bystander","stays_put",
@@ -116,7 +116,7 @@ def bystander(view=True,std_dev=0):
 	handlers =[(1,2,rem0)]
 	# Agent velocities
 	vel = 300,300,300
-	env = Environment(a_params,p_params,f_params,vel,handlers,view)
+	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
 	env.run()
 	return env
 
@@ -145,7 +145,7 @@ def stays_put(view=True,std_dev=0):
 	handlers =[(1,2,rem0)]
 	# Agent velocities
 	vel = 300,300,300
-	env = Environment(a_params,p_params,f_params,vel,handlers,view)
+	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
 	env.run()
 	return env
 
@@ -174,7 +174,7 @@ def short_distance(view=True,std_dev=0):
 	handlers =[(1,2,rem0)]
 	# Agent velocities
 	vel = 300,300,300
-	env = Environment(a_params,p_params,f_params,vel,handlers,view)
+	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
 	env.run()
 	return env
 
@@ -203,7 +203,7 @@ def med_push(view=True,std_dev=0):
 	handlers =[(1,2,rem0)]
 	# Agent velocities
 	vel = 300,300,300
-	env = Environment(a_params,p_params,f_params,vel,handlers,view)
+	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
 	env.run()
 	return env
 
@@ -232,7 +232,7 @@ def long_push(view=True,std_dev=0):
 	handlers =[(1,2,rem0)]
 	# Agent velocities
 	vel = 300,300,300
-	env = Environment(a_params,p_params,f_params,vel,handlers,view)
+	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
 	env.run()
 	return env
 
@@ -262,7 +262,7 @@ def push_patient(view=True,std_dev=0):
 	handlers =[(1,2,rem0)]
 	# Agent velocities
 	vel = 300,300,300
-	env = Environment(a_params,p_params,f_params,vel,handlers,view)
+	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
 	env.run()
 	return env
 
@@ -291,7 +291,7 @@ def double_push(view=True,std_dev=0):
 	handlers =[(1,2,rem0)]
 	# Agent velocities
 	vel = 300,300,300
-	env = Environment(a_params,p_params,f_params,vel,handlers,view)
+	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
 	env.run()
 	return env
 
@@ -324,7 +324,7 @@ def harm_moving_moving(view=True,std_dev=0):
 	handlers =[(1,2,rem0)]
 	# Agent velocities
 	vel = 300,300,300
-	env = Environment(a_params,p_params,f_params,vel,handlers,view)
+	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
 	env.run()
 	return env
 
@@ -357,7 +357,7 @@ def victim_moving_moving(view=True,std_dev=0):
 	handlers =[(1,2,rem0)]
 	# Agent velocities
 	vel = 300,300,300
-	env = Environment(a_params,p_params,f_params,vel,handlers,view)
+	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
 	env.run()
 	return env
 
@@ -389,8 +389,8 @@ def harm_moving_static(view=True,std_dev=0):
 	handlers =[(1,2,rem0)]
 	# Agent velocities
 	vel = 300,300,300
-	env = Environment(a_params,p_params,f_params,vel,handlers,view)
-	env.run()
+	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
+	# env.run()
 	return env
 
 def victim_moving_static(view=True,std_dev=0):
@@ -422,7 +422,7 @@ def victim_moving_static(view=True,std_dev=0):
 	handlers =[(1,2,rem0)]
 	# Agent velocities
 	vel = 300,300,300
-	env = Environment(a_params,p_params,f_params,vel,handlers,view)
+	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
 	env.run()
 	return env
 
@@ -452,7 +452,7 @@ def harm_static_moving(view=True,std_dev=0):
 	handlers =[(1,2,rem0)]
 	# Agent velocities
 	vel = 300,300,300
-	env = Environment(a_params,p_params,f_params,vel,handlers,view)
+	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
 	env.run()
 	return env
 
@@ -482,7 +482,7 @@ def victim_static_moving(view=True,std_dev=0):
 	handlers =[(1,2,rem0)]
 	# Agent velocities
 	vel = 300,300,300
-	env = Environment(a_params,p_params,f_params,vel,handlers,view)
+	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
 	env.run()
 	return env
 
@@ -511,7 +511,7 @@ def harm_static_static(view=True,std_dev=0):
 	handlers =[(1,2,rem0)]
 	# Agent velocities
 	vel = 300,300,300
-	env = Environment(a_params,p_params,f_params,vel,handlers,view)
+	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
 	env.run()
 	return env
 
@@ -540,7 +540,7 @@ def victim_static_static(view=True,std_dev=0):
 	handlers =[(1,2,rem0)]
 	# Agent velocities
 	vel = 300,300,300
-	env = Environment(a_params,p_params,f_params,vel,handlers,view)
+	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
 	env.run()
 	return env
 
