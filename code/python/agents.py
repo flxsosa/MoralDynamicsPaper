@@ -74,7 +74,6 @@ class Agent:
 				for event in pygame.event.get():
 					pass
 			if abs(self.body.velocity[0]) < velocity:
-				print(std_dev)
 				impx = gauss(velocity - abs(self.body.velocity[0]), std_dev)
 				impy = gauss(0,std_dev)
 				self.body.apply_impulse_at_local_point((-1*impx,impy))
