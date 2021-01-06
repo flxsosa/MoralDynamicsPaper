@@ -19,8 +19,8 @@ class Agent:
 		Class for agents in scenarios. Used to instantiate the Blue Agent,
 		Green Agent, and Fireball in the Moral Dynamics project.
 
-		x 	  -- x dimension of initial location in a scenario
-		y	  -- y dimension of initial location in a scenario
+		x -- x dimension of initial location in a scenario
+		y -- y dimension of initial location in a scenario
 		color -- agent's color
 		collision -- collision type for agent body (used in pymunk)
 		moves -- actions the agent will take for a given scenario
@@ -50,37 +50,50 @@ class Agent:
 		self.shape.elasticity = 1
 		self.effort_expended = 0
 		self.actions = [self.action_dict[x] for x in moves]
+		self.tick = 0
+		self.counterfactual_tick = None
 
 	# Action definitions
 	def move_right(self, velocity, clock, screen, space, options, view, std_dev=0):
 		# Move agent right
 		intended_x_pos = self.body.position[0]+move_lat_distance
+		tmp_std = std_dev
 		while self.body.position[0] < intended_x_pos:
 			if view:
 				for event in pygame.event.get():
 					pass
 			if self.body.velocity[0] < velocity:
+				if self.counterfactual_tick and self.tick < self.counterfactual_tick:
+						std_dev = 0
+				elif self.counterfactual_tick and self.tick >= self.counterfactual_tick:
+						std_dev = tmp_std
+
 				impx = gauss(velocity - self.body.velocity[0], std_dev)
 				impy = gauss(0,std_dev)
 				self.body.apply_impulse_at_local_point((impx,impy))
 				self.effort_expended += (impx**2+impy**2)**0.5
 			yield
 
-	def move_left(self, velocity, clock, screen, space, options, view, std_dev=0):
+	def move_left(self,velocity,clock,screen,space,options,view,std_dev=0):
 		# Move agent left
 		intended_x_pos = self.body.position[0]-move_lat_distance
+		tmp_std = std_dev
 		while self.body.position[0] > intended_x_pos:
 			if view:
 				for event in pygame.event.get():
 					pass
 			if abs(self.body.velocity[0]) < velocity:
+				if self.counterfactual_tick and self.tick < self.counterfactual_tick:
+						std_dev = 0
+				elif self.counterfactual_tick and self.tick >= self.counterfactual_tick:
+						std_dev = tmp_std
 				impx = gauss(velocity - abs(self.body.velocity[0]), std_dev)
 				impy = gauss(0,std_dev)
 				self.body.apply_impulse_at_local_point((-1*impx,impy))
 				self.effort_expended += (impx**2+impy**2)**0.5
 			yield
 
-	def move_up(self, velocity, clock, screen, space, options, view, std_dev=0):
+	def move_up(self,velocity,clock,screen,space,options,view,std_dev=0):
 		# Move agent up
 		intended_y_pos = self.body.position[1]+move_long_distance
 		while self.body.position[1] < intended_y_pos:
@@ -95,7 +108,7 @@ class Agent:
 				self.effort_expended += (impx**2+impy**2)**0.5
 			yield
 
-	def move_down(self, velocity, clock, screen, space, options, view, std_dev=0):
+	def move_down(self,velocity,clock,screen,space,options,view,std_dev=0):
 		# Move agent up
 		intended_y_pos = self.body.position[1]-move_long_distance
 		while self.body.position[1] > intended_y_pos:
@@ -109,7 +122,7 @@ class Agent:
 				self.effort_expended += (impx**2+impy**2)**0.5
 			yield
 
-	def stay_put(self, velocity, clock, screen, space, options, view, std_dev=0):
+	def stay_put(self,velocity,clock,screen,space,options,view,std_dev=0):
 		# Agent stays put. This is different from do_nothing in that the 
 		# 	agent will apply a force to maintain its current location if 
 		# 	pushed or pulled in some direction.
@@ -210,14 +223,14 @@ class Agent:
 					pass
 			yield
 
-	def act(self, velocity, clock, screen, space, options, view, std_dev=0):
+	def act(self,velocity,clock,screen,space,options,view,std_dev=0):
 		# Execute policy
 		actions = iter(self.actions)
 		actions_left = True
 		action = next(actions)
 		while actions_left:
 			try:
-				for _ in action(velocity, clock, screen, space, options, view, std_dev):
+				for _ in action(velocity,clock,screen,space,options,view,std_dev):
 					yield
 				action = next(actions)
 			except:
