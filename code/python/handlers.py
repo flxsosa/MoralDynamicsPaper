@@ -10,7 +10,7 @@ import pymunk
 from pygame.locals import *
 
 PF_COLLISION = []
-
+AP_COLLISION = []
 def rem0(arbiter, space, data):
 	'''
 	Used with post_solve. Removes the Green Agent after colliding with 
@@ -27,4 +27,19 @@ def rem0(arbiter, space, data):
 	running = False
 	PF_COLLISION.append(1)
 	pygame.time.set_timer(QUIT, 1000)
+	return True
+
+def ap0(arbiter, space, data):
+	'''
+	Used with post_solve. Determines if Agent
+	and Patient have collided.
+	Expected that Green Agent is in space.shapes[1].
+
+	arbiter -- Pymunk collision arbiter
+	space   -- Pymunk space in which simulations are run
+	data    -- Pymunk collision data
+	'''
+	if AP_COLLISION:
+		return True
+	AP_COLLISION.append(1)
 	return True
