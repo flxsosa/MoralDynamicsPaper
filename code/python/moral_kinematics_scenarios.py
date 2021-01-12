@@ -16,9 +16,14 @@ F = Fireball
 Felix Sosa
 '''
 from environment import Environment
-from handlers import rem0
+from handlers import rem0, ap0
 
-__test__ = [ "harm_moving_static"]
+__test__ = ["long_distance","dodge","bystander","stays_put",
+	    "short_distance","med_push","long_push","push_patient",
+	    "double_push","harm_moving_moving","harm_moving_static",
+	    "harm_static_moving","harm_static_static",
+	    "victim_moving_moving","victim_moving_static",
+	    "victim_static_moving","victim_static_static"]
 
 # Scenarios used in experiment 1 (see paper)
 __experiment1__ = ["long_distance","dodge","bystander","stays_put",
@@ -59,7 +64,7 @@ def long_distance(view=True,std_dev=0):
 	# Agent velocities
 	vel = 300,150,150
 	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
-	env.run()
+	# env.run()
 	return env
 
 def dodge(view=True,std_dev=0):
@@ -88,7 +93,7 @@ def dodge(view=True,std_dev=0):
 	# Agent velocities
 	vel = 300,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
-	env.run()
+	# env.run()
 	return env
 
 def bystander(view=True,std_dev=0):
@@ -117,7 +122,7 @@ def bystander(view=True,std_dev=0):
 	# Agent velocities
 	vel = 300,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
-	env.run()
+	# env.run()
 	return env
 
 def stays_put(view=True,std_dev=0):
@@ -146,7 +151,7 @@ def stays_put(view=True,std_dev=0):
 	# Agent velocities
 	vel = 300,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
-	env.run()
+	# env.run()
 	return env
 
 def short_distance(view=True,std_dev=0):
@@ -175,7 +180,7 @@ def short_distance(view=True,std_dev=0):
 	# Agent velocities
 	vel = 300,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
-	env.run()
+	# env.run()
 	return env
 
 def med_push(view=True,std_dev=0):
@@ -204,7 +209,7 @@ def med_push(view=True,std_dev=0):
 	# Agent velocities
 	vel = 300,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
-	env.run()
+	# env.run()
 	return env
 
 def long_push(view=True,std_dev=0):
@@ -233,7 +238,7 @@ def long_push(view=True,std_dev=0):
 	# Agent velocities
 	vel = 300,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
-	env.run()
+	# env.run()
 	return env
 
 def push_patient(view=True,std_dev=0):
@@ -251,7 +256,7 @@ def push_patient(view=True,std_dev=0):
 	# Patient parameters
 	p_params['loc'] = (900,300)
 	p_params['color'] = "green"
-	p_params['moves'] = ['L','L','L','N','N', 'N']
+	p_params['moves'] = ['L','L','L','L','L','L']
 	p_params['coll'] = 1
 	# Fireball parameters
 	f_params['loc'] = (300,200)
@@ -259,11 +264,11 @@ def push_patient(view=True,std_dev=0):
 	f_params['moves'] = ['N','N','N','N','N','N']
 	f_params['coll'] = 2
 	# Collision handlers
-	handlers =[(1,2,rem0)]
+	handlers =[(0,1,ap0),(1,2,rem0)]
 	# Agent velocities
 	vel = 300,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
-	env.run()
+	# env.run()
 	return env
 
 def double_push(view=True,std_dev=0):
@@ -288,11 +293,11 @@ def double_push(view=True,std_dev=0):
 	f_params['moves'] = ['N','N','N','N','N','N']
 	f_params['coll'] = 2
 	# Collision handlers
-	handlers =[(1,2,rem0)]
+	handlers =[(0,1,ap0),(1,2,rem0)]
 	# Agent velocities
 	vel = 300,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
-	env.run()
+	# env.run()
 	return env
 
 def harm_moving_moving(view=True,std_dev=0):
@@ -321,11 +326,11 @@ def harm_moving_moving(view=True,std_dev=0):
 	f_params['moves'] = ['L','L','L','N', 'N']
 	f_params['coll'] = 2
 	# Collision handlers
-	handlers =[(1,2,rem0)]
+	handlers =[(0,1,ap0),(1,2,rem0)]
 	# Agent velocities
 	vel = 300,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
-	env.run()
+	# env.run()
 	return env
 
 def victim_moving_moving(view=True,std_dev=0):
@@ -354,11 +359,11 @@ def victim_moving_moving(view=True,std_dev=0):
 	f_params['moves'] = ['R','R','R','N', 'N']
 	f_params['coll'] = 2
 	# Collision handlers
-	handlers =[(1,2,rem0)]
+	handlers =[(0,1,ap0),(1,2,rem0)]
 	# Agent velocities
 	vel = 300,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
-	env.run()
+	# env.run()
 	return env
 
 def harm_moving_static(view=True,std_dev=0):
@@ -383,10 +388,10 @@ def harm_moving_static(view=True,std_dev=0):
 	# f_params['loc'] = (450,500) # <- check this out
 	f_params['loc'] = (900,300)
 	f_params['color'] = "red"
-	f_params['moves'] = ['L','L','L','N','N']
+	f_params['moves'] = ['L','L','L','L','L']
 	f_params['coll'] = 2
 	# Collision handlers
-	handlers =[(1,2,rem0)]
+	handlers =[(0,1,ap0),(1,2,rem0)]
 	# Agent velocities
 	vel = 300,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
@@ -419,11 +424,11 @@ def victim_moving_static(view=True,std_dev=0):
 	f_params['moves'] = ['N','N','N','N','N']
 	f_params['coll'] = 2
 	# Collision handlers
-	handlers =[(1,2,rem0)]
+	handlers =[(0,1,ap0),(1,2,rem0)]
 	# Agent velocities
 	vel = 300,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
-	env.run()
+	# env.run()
 	return env
 
 def harm_static_moving(view=True,std_dev=0):
@@ -449,11 +454,11 @@ def harm_static_moving(view=True,std_dev=0):
 	f_params['moves'] = ['N','N','N','N','N']
 	f_params['coll'] = 2
 	# Collision handlers
-	handlers =[(1,2,rem0)]
+	handlers =[(0,1,ap0),(1,2,rem0)]
 	# Agent velocities
 	vel = 300,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
-	env.run()
+	# env.run()
 	return env
 
 def victim_static_moving(view=True,std_dev=0):
@@ -479,11 +484,11 @@ def victim_static_moving(view=True,std_dev=0):
 	f_params['moves'] = ['L','L','L','N','N']
 	f_params['coll'] = 2
 	# Collision handlers
-	handlers =[(1,2,rem0)]
+	handlers =[(0,1,ap0),(1,2,rem0)]
 	# Agent velocities
 	vel = 300,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
-	env.run()
+	# env.run()
 	return env
 
 def harm_static_static(view=True,std_dev=0):
@@ -508,11 +513,11 @@ def harm_static_static(view=True,std_dev=0):
 	f_params['moves'] = ['N','N','N','N','N']
 	f_params['coll'] = 2
 	# Collision handlers
-	handlers =[(1,2,rem0)]
+	handlers =[(0,1,ap0),(1,2,rem0)]
 	# Agent velocities
 	vel = 300,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
-	env.run()
+	# env.run()
 	return env
 
 def victim_static_static(view=True,std_dev=0):
@@ -537,11 +542,11 @@ def victim_static_static(view=True,std_dev=0):
 	f_params['moves'] = ['N','N','N','N','N']
 	f_params['coll'] = 2
 	# Collision handlers
-	handlers =[(1,2,rem0)]
+	handlers =[(0,1,ap0),(1,2,rem0)]
 	# Agent velocities
 	vel = 300,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
-	env.run()
+	# env.run()
 	return env
 
 def bot_check(view=True,std_dev=0):
@@ -566,10 +571,12 @@ def bot_check(view=True,std_dev=0):
 	f_params['moves'] = ['U','U','U','N','N']
 	f_params['coll'] = 2
 	# Collision handlers
-	handlers =[(1,2,rem0)]
+	handlers =[(0,1,ap0),(1,2,rem0)]
 	# Agent velocities
 	vel = 300,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view)
-	env.run()
+	# env.run()
 	return env
 
+
+long_distance(True).run()
