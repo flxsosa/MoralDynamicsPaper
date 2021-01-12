@@ -56,6 +56,7 @@ class Environment:
 		# Values needed for rendering the scenario in Blender
 		self.tick = 0
 		self.agent_collision = None
+		self.agent_patient_collision = None
 		self.patient_fireball_collision = 0
 		self.position_dict = {
 			'agent':[],
@@ -108,6 +109,7 @@ class Environment:
 							'y':self.fireball.body.position[1]})
 		# Record when the Agent collides with someone else
 		if not handlers.PF_COLLISION: self.agent_collision = self.tick
+		if not handlers.AP_COLLISION: self.agent_patient_collision = self.tick
 
 	def run(self):
 		'''
@@ -128,6 +130,7 @@ class Environment:
 		# Main loop. Run simulation until collision between Green Agent 
 		# 	and Fireball
 		while running and not handlers.PF_COLLISION:
+			# if not handlers.AP_COLLISION: self.agent_patient_collision = self.tick
 			try:
 				# Generate the next tick in the simulation for each object
 				next(a_generator)
@@ -153,26 +156,28 @@ class Environment:
 		self.patient_fireball_collision = 1 if handlers.PF_COLLISION else 0
 		# Reset collision handler
 		handlers.PF_COLLISION = []
+		handlers.AP_COLLISION = []
 
 	def counterfactual_run(self,std_dev,collision_tick):
 		'''
 		Forward method for Environments. Actually runs the scenarios you
 		view on (or off) screen.
 		'''
-		self.agent_collision = collision_tick
-		pygame.init()
-		self.screen = pygame.display.set_mode((1000,600))
-		self.options = pymunk.pygame_util.DrawOptions(self.screen)
-		self.clock = pygame.time.Clock()
+		self.agent_patient_collision = collision_tick
 		self.space.remove(self.space.shapes[0])
 		self.space.remove(self.space.bodies[0])
+		pygame.init()
+		if self.view:
+			pygame.init()
+			self.screen = pygame.display.set_mode((1000,600))
+			self.options = pymunk.pygame_util.DrawOptions(self.screen)
+			self.clock = pygame.time.Clock()
 		self.std_dev = std_dev
 		# Agent velocities
 		_, p_vel, f_vel = self.vel
 		# Counterfactual ticks for agents
-		self.agent.counterfactual_tick = self.agent_collision
-		self.patient.counterfactual_tick = self.agent_collision
-		self.fireball.counterfactual_tick = self.agent_collision
+		self.patient.counterfactual_tick = self.agent_patient_collision
+		self.fireball.counterfactual_tick = self.agent_patient_collision
 		# Agent action generators (yield actions of agents)
 		p_generator = self.patient.act(p_vel, self.clock, self.screen,
 						self.space, self.options, self.view, self.std_dev)
@@ -199,7 +204,6 @@ class Environment:
 				# Increment the simulation tick
 				self.tick += 1
 				# Increment ticks in agents
-				self.agent.tick = self.tick
 				self.patient.tick = self.tick
 				self.fireball.tick = self.tick
 			except:
@@ -211,3 +215,4 @@ class Environment:
 		self.patient_fireball_collision = 1 if handlers.PF_COLLISION else 0
 		# Reset collision handler
 		handlers.PF_COLLISION = []
+		handlers.AP_COLLISION = []
