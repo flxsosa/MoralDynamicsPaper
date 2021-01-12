@@ -13,6 +13,13 @@ move_lat_distance = 160
 move_long_distance = 160
 wait_period = 27
 
+def is_inside(body_pos, tgt_pos):
+	eps = 2
+	return (body_pos[0] < (tgt_pos[0] + eps) and
+		body_pos[0] > (tgt_pos[0] - eps) and
+		body_pos[1] < (tgt_pos[1] + eps) and
+		body_pos[1] > (tgt_pos[1] - eps))
+
 class Agent:
 	def __init__(self, x, y, color, collision, moves, mass=1, rad=25):
 		'''
@@ -96,11 +103,16 @@ class Agent:
 	def move_up(self,velocity,clock,screen,space,options,view,std_dev=0):
 		# Move agent up
 		intended_y_pos = self.body.position[1]+move_long_distance
+		tmp_std = std_dev
 		while self.body.position[1] < intended_y_pos:
 			if view:
 				for event in pygame.event.get():
 					pass
 			if self.body.velocity[1] < velocity:
+				if self.counterfactual_tick and self.tick < self.counterfactual_tick:
+						std_dev = 0
+				elif self.counterfactual_tick and self.tick >= self.counterfactual_tick:
+						std_dev = tmp_std
 				impy = gauss(velocity - self.body.velocity[1], std_dev)
 				impx = gauss(0,std_dev)
 				imp = velocity - self.body.velocity[1]
@@ -111,11 +123,17 @@ class Agent:
 	def move_down(self,velocity,clock,screen,space,options,view,std_dev=0):
 		# Move agent up
 		intended_y_pos = self.body.position[1]-move_long_distance
+		tmp_std = std_dev
 		while self.body.position[1] > intended_y_pos:
 			if view:
 				for event in pygame.event.get():
 					pass
 			if abs(self.body.velocity[1]) < velocity:
+				if self.counterfactual_tick and self.tick < self.counterfactual_tick:
+						std_dev = 0
+				elif self.counterfactual_tick and self.tick >= self.counterfactual_tick:
+						std_dev = tmp_std
+
 				impy = gauss(velocity - abs(self.body.velocity[1]), std_dev)
 				impx = gauss(0,std_dev)
 				self.body.apply_impulse_at_local_point((impx,-1*impy))
@@ -145,12 +163,17 @@ class Agent:
 		# 	Moral Kinematics)
 		tick = 0
 		intended_x_pos = self.body.position[0]+move_lat_distance+move_lat_distance*0.6
+		tmp_std = std_dev
 		while self.body.position[0] < intended_x_pos:
 			if view:
 				for event in pygame.event.get():
 					pass
 			tick += 1
 			if self.body.velocity[0] < velocity:
+				if self.counterfactual_tick and self.tick < self.counterfactual_tick:
+						std_dev = 0
+				elif self.counterfactual_tick and self.tick >= self.counterfactual_tick:
+						std_dev = tmp_std
 				impx = gauss(velocity - abs(self.body.velocity[0]), std_dev)
 				impy = gauss(0,std_dev)
 				self.body.apply_impulse_at_local_point((impx,impy))
@@ -161,17 +184,22 @@ class Agent:
 		# Move agent down (special case for replicating scenarios in 
 		# 	Moral Kinematics)
 		intended_y_pos = self.body.position[1]-move_long_distance/3.0
+		tmp_std = std_dev
 		while self.body.position[1] > intended_y_pos:
 			if view:
 				for event in pygame.event.get():
 					pass
 			if abs(self.body.velocity[1]) < velocity:
+				if self.counterfactual_tick and self.tick < self.counterfactual_tick:
+						std_dev = 0
+				elif self.counterfactual_tick and self.tick >= self.counterfactual_tick:
+						std_dev = tmp_std
 				impy = gauss(velocity - abs(self.body.velocity[1]), std_dev)
 				impx = gauss(0,std_dev)
 				self.body.apply_impulse_at_local_point((impx,-1*impy))
 				self.effort_expended += (impx**2+impy**2)**0.5
 			yield
-		for _ in range(2*wait_period/3):
+		for _ in range(wait_period):
 			if view:
 				for event in pygame.event.get():
 					pass
@@ -181,17 +209,22 @@ class Agent:
 		# Move agent down (special case for replicating scenarios in 
 		# 	Moral Kinematics)
 		intended_y_pos = self.body.position[1]-move_long_distance/2.5
+		tmp_std = std_dev
 		while self.body.position[1] > intended_y_pos:
 			if view:
 				for event in pygame.event.get():
 					pass
 			if abs(self.body.velocity[1]) < velocity:
+				if self.counterfactual_tick and self.tick < self.counterfactual_tick:
+						std_dev = 0
+				elif self.counterfactual_tick and self.tick >= self.counterfactual_tick:
+						std_dev = tmp_std
 				impy = gauss(velocity - abs(self.body.velocity[1]), std_dev)
 				impx = gauss(0,std_dev)
 				self.body.apply_impulse_at_local_point((impx,-1*impy))
 				self.effort_expended += (impx**2+impy**2)**0.5
 			yield
-		for _ in range(wait_period/2):
+		for _ in range(wait_period):
 			if view:
 				for event in pygame.event.get():
 					pass
@@ -235,3 +268,20 @@ class Agent:
 				action = next(actions)
 			except:
 				return
+
+	def vec_move(self,trajectory,velocity,clock,screen,space,options,view,std_dev=0):
+		for tgt_pos in trajectory:
+			while not is_inside(self.body.position, tgt_pos):
+				print(self.body.position)
+				if view:
+					for event in pygame.event.get():
+						pass
+				# Update velocity and record effort
+				if self.body.velocity.length < velocity:
+					# Compute vector direction
+					direction = tgt_pos - self.body.position
+					direction = direction.normalized()
+					impulse = velocity*direction - self.body.velocity
+					self.body.apply_impulse_at_local_point(impulse)
+					self.effort_expended += impulse.length
+				yield
