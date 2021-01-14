@@ -119,12 +119,12 @@ class Environment:
 		# Agent velocities
 		a_vel, p_vel, f_vel = self.vel
 		# Agent action generators (yield actions of agents)
-		a_generator = self.agent.act(a_vel, self.clock, self.screen,
-						self.space, self.options, self.view, self.std_dev)
-		p_generator = self.patient.act(p_vel, self.clock, self.screen,
-						self.space, self.options, self.view, self.std_dev)
-		f_generator = self.fireball.act(f_vel, self.clock, self.screen,
-						self.space, self.options, self.view, self.std_dev)
+		a_generator = self.agent.act(a_vel,self.clock,self.screen,
+						self.space,self.options, self.view,self.std_dev)
+		p_generator = self.patient.act(p_vel,self.clock,self.screen,
+						self.space,self.options,self.view,self.std_dev)
+		f_generator = self.fireball.act(f_vel,self.clock,self.screen,
+						self.space,self.options,self.view,self.std_dev)
 		# Running flag
 		running = True
 		# Main loop. Run simulation until collision between Green Agent 
