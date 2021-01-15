@@ -57,6 +57,7 @@ class Environment:
 		self.tick = 0
 		self.agent_collision = None
 		self.agent_patient_collision = None
+		self.agent_fireball_collision = None
 		self.patient_fireball_collision = 0
 		self.position_dict = {
 			'agent':[],
