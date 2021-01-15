@@ -25,13 +25,6 @@ __test__ = ["long_distance","dodge","bystander","stays_put",
 	    "victim_moving_moving","victim_moving_static",
 	    "victim_static_moving","victim_static_static"]
 
-__experiment3__ = ["dodge","bystander","stays_put", "stays_put_red",
-		   "short_distance","med_push","long_push",
-		   "double_push","harm_moving_moving","harm_moving_static",
-		   "harm_static_moving","victim_moving_moving",
-		   "victim_moving_static","victim_static_moving","new","new2",
-		   "exp6_video20","exp6_video19","exp6_video25","exp6_video26",
-		   "med_distance"]
 # Scenarios used in experiment 1 (see paper)
 __experiment1__ = ["long_distance","dodge","bystander","stays_put",
 			"short_distance","med_push","long_push","push_patient",
@@ -39,11 +32,20 @@ __experiment1__ = ["long_distance","dodge","bystander","stays_put",
 
 # Scenarios used in experiment 2 (see paper)
 __experiment2__ = ["long_distance","dodge","bystander","stays_put",
-			"short_distance","med_push","long_push","push_patient", 
+			"short_distance","med_push","long_push","push_patient",
 			"double_push","harm_moving_moving","harm_moving_static",
 			"harm_static_moving","harm_static_static",
 			"victim_moving_moving","victim_moving_static",
 			"victim_static_moving","victim_static_static"]
+
+# Scenarios used in experiment 3 (see paper)
+__experiment3__ = ["dodge","bystander","stays_put", "stays_put_red",
+		   "short_distance","med_push","long_push",
+		   "double_push","harm_moving_moving","harm_moving_static",
+		   "harm_static_moving","victim_moving_moving",
+		   "victim_moving_static","victim_static_moving","new","new2",
+		   "exp6_video20","exp6_video19","exp6_video25","exp6_video26",
+		   "med_distance"]
 
 def long_distance(view=True,std_dev=0):
 	# - - - - - - -
