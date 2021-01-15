@@ -6,8 +6,12 @@ def determine_outcome(environment):
     a Patient and Fireball.
     '''
     environment.run()
-    print(environment.agent_patient_collision)
     return environment.patient_fireball_collision, environment.agent_patient_collision
+
+def run_sim(environment):
+    environment = environment(False)
+    environment.run()
+    return environment.agent.effort_expended
 
 def counterfactual_simulation(true_outcome,environment,tick,std_dev,num_times):
     # Determine counterfactual probability
@@ -35,8 +39,14 @@ def iterate_std_dev(environment,start,end,step,num_times):
         std_dev_prob_map[std_dev] = counterfactual_prob
     return std_dev_prob_map
 
-for scene in scenarios.__test__:
-    print(scene)
+# for scene in scenarios.__experiment3__:
+#     print("==== Simulation ==== ", scene)
+#     sim = getattr(scenarios, scene)
+#     m = iterate_std_dev(sim,start=10,end=110,step=10,num_times=100)
+#     print("   ", m)
+
+for scene in scenarios.__experiment3__:
+    print("==== Simulation ==== ", scene)
     sim = getattr(scenarios, scene)
-    m = iterate_std_dev(sim,start=10,end=110,step=10,num_times=100)
+    m = run_sim(sim)
     print(m)
