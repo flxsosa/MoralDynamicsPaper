@@ -46,7 +46,8 @@ class Agent:
 			'DS2':self.move_down_special_2,
 			'RS':self.move_right_special,
 			'NS':self.do_nothing_special,
-			'NS2':self.do_nothing_special_2
+			'NS2':self.do_nothing_special_2,
+			'LD' :self.move_left_diag
 		}
 		# Agent attributes
 		self.body = pymunk.Body(mass,1)
@@ -255,6 +256,22 @@ class Agent:
 				for event in pygame.event.get():
 					pass
 			yield
+	def move_left_diag(self, velocity, clock, screen, space, options, view, std_dev=0):
+		tgt_pos = self.body.position + (-100,50)
+		# Move agent right
+		while not is_inside(self.body.position, tgt_pos):
+				if view:
+					for event in pygame.event.get():
+						pass
+				# Update velocity and record effort
+				if self.body.velocity.length < velocity:
+					# Compute vector direction
+					direction = tgt_pos - self.body.position
+					direction = direction.normalized()
+					impulse = velocity*direction - self.body.velocity
+					self.body.apply_impulse_at_local_point(impulse)
+					self.effort_expended += impulse.length
+				yield
 
 	def act(self,velocity,clock,screen,space,options,view,std_dev=0):
 		# Execute policy
