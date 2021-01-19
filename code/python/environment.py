@@ -1,5 +1,5 @@
 '''
-Class for agent environments in Moral Dynamics
+
 
 Felix Sosa
 '''
@@ -46,6 +46,9 @@ class Environment:
 		self.friction = frict
 		# Agent velocities
 		self.vel = vel
+		self.pf_lock = False
+		self.af_lock = False
+		self.ap_lock = False
 		# Engine parameters
 		self.space = None
 		self.screen = None
@@ -109,8 +112,15 @@ class Environment:
 		self.position_dict['fireball'].append({'x':self.fireball.body.position[0], 
 							'y':self.fireball.body.position[1]})
 		# Record when the Agent collides with someone else
-		if not handlers.PF_COLLISION: self.agent_collision = self.tick
-		if not handlers.AP_COLLISION: self.agent_patient_collision = self.tick
+		if handlers.PF_COLLISION and not self.pf_lock:
+			self.agent_collision = self.tick #- len(handlers.PF_COLLISION)
+			self.pf_lock = True
+		if handlers.AP_COLLISION and not self.ap_lock:
+			self.agent_patient_collision = self.tick #- len(handlers.AP_COLLISION)
+			self.ap_lock = True
+		if handlers.AF_COLLISION and not self.af_lock:
+			self.agent_fireball_collision = self.tick #- len(handlers.AF_COLLISION)
+			self.af_lock = True
 
 	def run(self):
 		'''
@@ -158,6 +168,7 @@ class Environment:
 		# Reset collision handler
 		handlers.PF_COLLISION = []
 		handlers.AP_COLLISION = []
+		handlers.AF_COLLISION = []
 
 	def counterfactual_run(self,std_dev,collision_tick):
 		'''
@@ -178,7 +189,7 @@ class Environment:
 		_, p_vel, f_vel = self.vel
 		# Counterfactual ticks for agents
 		self.patient.counterfactual_tick = self.agent_patient_collision
-		self.fireball.counterfactual_tick = self.agent_patient_collision
+		self.fireball.counterfactual_tick = self.agent_fireball_collision
 		# Agent action generators (yield actions of agents)
 		p_generator = self.patient.act(p_vel, self.clock, self.screen,
 						self.space, self.options, self.view, self.std_dev)
