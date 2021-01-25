@@ -27,16 +27,16 @@ __test__ = ["long_distance","dodge","bystander","stays_put",
 
 # Scenarios used in experiment 1 (see paper)
 __experiment1__ = ["long_distance","dodge","bystander","stays_put",
-			"short_distance","med_push","long_push","push_patient",
-			"double_push"]
+		   "short_distance","med_push","long_push","push_patient",
+		   "double_push"]
 
 # Scenarios used in experiment 2 (see paper)
 __experiment2__ = ["long_distance","dodge","bystander","stays_put",
-			"short_distance","med_push","long_push","push_patient",
-			"double_push","harm_moving_moving","harm_moving_static",
-			"harm_static_moving","harm_static_static",
-			"victim_moving_moving","victim_moving_static",
-			"victim_static_moving","victim_static_static"]
+		   "short_distance","med_push","long_push","push_patient",
+		   "double_push","harm_moving_moving","harm_moving_static",
+		   "harm_static_moving","harm_static_static",
+		   "victim_moving_moving","victim_moving_static",
+		   "victim_static_moving","victim_static_static"]
 
 # Scenarios used in experiment 3 (see paper)
 __experiment3__ = ["dodge","bystander","stays_put","stays_put_red",
@@ -55,7 +55,7 @@ def long_distance(view=True,std_dev=0):
 	# Agent parameters
 	a_params['loc'] = (100,300)
 	a_params['color'] = "blue"
-	a_params['moves'] = ['R', 'R', 'R', 'R', 'N']
+	a_params['moves'] = ['R', 'R', 'R', 'R', 'R']
 	a_params['coll'] = 0
 	a_params['type'] = 'B'
 	# Patient parameters
@@ -84,7 +84,7 @@ def dodge(view=True,std_dev=0):
 	# Agent parameters
 	a_params['loc'] = (500,300)
 	a_params['color'] = "blue"
-	a_params['moves'] = ['N', 'N', 'DS', 'N', 'N']
+	a_params['moves'] = ['N', 'N', 'DS', 'S', 'S']
 	a_params['coll'] = 0
 	a_params['type'] = 'B'
 	# Patient parameters
@@ -100,7 +100,7 @@ def dodge(view=True,std_dev=0):
 	# Collision handlers
 	handlers =[(0,1,ap0),(0,2,af0),(1,2,rem0)]
 	# Agent velocities
-	vel = 300,300,300
+	vel = 400,300,300
 	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
 	# env.run()
 	return env
@@ -513,12 +513,12 @@ def harm_static_moving(view=True,std_dev=0):
 	f_params['loc'] = (500,230)
 	f_params['color'] = "red"
 	f_params['moves'] = ['N','N','N','N','N']
-	f_params['coll'] = 1
+	f_params['coll'] = 2
 	# Fireball parameters
 	p_params['loc'] = (900,130)
 	p_params['color'] = "green"
 	p_params['moves'] = ['L','L','L','L','L']
-	p_params['coll'] = 2
+	p_params['coll'] = 1
 	# Collision handlers
 	handlers =[(0,1,ap0),(0,2,af0),(1,2,rem0)]
 	# Agent velocities
@@ -644,7 +644,6 @@ def bot_check(view=True,std_dev=0):
 	# env.run()
 	return env
 
-
 def exp6_video20(view=True,std_dev=0):
 	# - - - - - - -
 	# A > > P - - F
@@ -662,7 +661,7 @@ def exp6_video20(view=True,std_dev=0):
 	p_params['moves'] = ['R','R','R','R','R','R','R']
 	p_params['coll'] = 1
 	# Fireball parameters
-	f_params['loc'] = (800,300)
+	f_params['loc'] = (550,300)
 	f_params['color'] = "red"
 	f_params['moves'] = ['N','N','N','N','N','N','N']
 	f_params['coll'] = 2
@@ -691,7 +690,7 @@ def exp6_video19(view=True,std_dev=0):
 	f_params['moves'] = ['R','R','R','R','R','R','R']
 	f_params['coll'] = 2
 	# Fireball parameters
-	p_params['loc'] = (800,300)
+	p_params['loc'] = (550,300)
 	p_params['color'] = "green"
 	p_params['moves'] = ['N','N','N','N','N','N','N']
 	p_params['coll'] = 1
@@ -720,7 +719,7 @@ def exp6_video26(view=True,std_dev=0):
 	f_params['moves'] = ['R','R','R','R','R']
 	f_params['coll'] = 2
 	# Fireball parameters
-	p_params['loc'] = (800,300)
+	p_params['loc'] = (750,300)
 	p_params['color'] = "green"
 	p_params['moves'] = ['L','L','L','L','L']
 	p_params['coll'] = 1
@@ -749,7 +748,7 @@ def exp6_video25(view=True,std_dev=0):
 	p_params['moves'] = ['R','R','R','R','R']
 	p_params['coll'] = 1
 	# Fireball parameters
-	f_params['loc'] = (800,300)
+	f_params['loc'] = (750,300)
 	f_params['color'] = "red"
 	f_params['moves'] = ['L','L','L','L','L']
 	f_params['coll'] = 2
@@ -818,4 +817,5 @@ def new2(view=True,std_dev=0):
 	env = Environment(a_params,p_params,f_params,vel,handlers,view,std_dev)
 	# env.run()
 	return env
+
 
