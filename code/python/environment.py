@@ -9,6 +9,7 @@ import pymunk.pygame_util
 from pygame.locals import *
 import handlers
 from agents import Agent
+from video import make_video, vid_from_img
 
 class Environment:
 	def __init__(self, a_params, p_params, f_params, vel, handlers=None, 
@@ -113,16 +114,16 @@ class Environment:
 							'y':self.fireball.body.position[1]})
 		# Record when the Agent collides with someone else
 		if handlers.PF_COLLISION and not self.pf_lock:
-			self.agent_collision = self.tick #- len(handlers.PF_COLLISION)
+			self.agent_collision = self.tick
 			self.pf_lock = True
 		if handlers.AP_COLLISION and not self.ap_lock:
-			self.agent_patient_collision = self.tick #- len(handlers.AP_COLLISION)
+			self.agent_patient_collision = self.tick
 			self.ap_lock = True
 		if handlers.AF_COLLISION and not self.af_lock:
-			self.agent_fireball_collision = self.tick #- len(handlers.AF_COLLISION)
+			self.agent_fireball_collision = self.tick
 			self.af_lock = True
 
-	def run(self):
+	def run(self,video=False,filename=""):
 		'''
 		Forward method for Environments. Actually runs the scenarios you
 		view on (or off) screen.
@@ -131,13 +132,15 @@ class Environment:
 		a_vel, p_vel, f_vel = self.vel
 		# Agent action generators (yield actions of agents)
 		a_generator = self.agent.act(a_vel,self.clock,self.screen,
-						self.space,self.options, self.view,self.std_dev)
+					     self.space,self.options, self.view,self.std_dev)
 		p_generator = self.patient.act(p_vel,self.clock,self.screen,
-						self.space,self.options,self.view,self.std_dev)
+					       self.space,self.options,self.view,self.std_dev)
 		f_generator = self.fireball.act(f_vel,self.clock,self.screen,
 						self.space,self.options,self.view,self.std_dev)
 		# Running flag
 		running = True
+		# Video creation
+		save_screen = make_video(self.screen)
 		# Main loop. Run simulation until collision between Green Agent 
 		# 	and Fireball
 		while running and not handlers.PF_COLLISION:
@@ -158,7 +161,11 @@ class Environment:
 				self.update_blender_values()
 				# Increment the simulation tick
 				self.tick += 1
-			except:
+				if video:
+					next(save_screen)
+			except Exception as e:
+				print(repr(e))
+				print("End")
 				running = False
 		if self.view:
 			pygame.quit()
@@ -169,13 +176,15 @@ class Environment:
 		handlers.PF_COLLISION = []
 		handlers.AP_COLLISION = []
 		handlers.AF_COLLISION = []
+		if video:
+			vid_from_img(filename)
 
-	def counterfactual_run(self,std_dev,collision_tick):
+	def counterfactual_run(self,std_dev,filename):
 		'''
 		Forward method for Environments. Actually runs the scenarios you
 		view on (or off) screen.
 		'''
-		self.agent_patient_collision = collision_tick
+		video = True
 		self.space.remove(self.space.shapes[0])
 		self.space.remove(self.space.bodies[0])
 		pygame.init()
@@ -185,6 +194,7 @@ class Environment:
 			self.options = pymunk.pygame_util.DrawOptions(self.screen)
 			self.clock = pygame.time.Clock()
 		self.std_dev = std_dev
+		save_screen = make_video(self.screen)
 		# Agent velocities
 		_, p_vel, f_vel = self.vel
 		# Counterfactual ticks for agents
@@ -218,6 +228,8 @@ class Environment:
 				# Increment ticks in agents
 				self.patient.tick = self.tick
 				self.fireball.tick = self.tick
+				if video:
+					next(save_screen)
 			except:
 				running = False
 		if self.view:
@@ -228,3 +240,6 @@ class Environment:
 		# Reset collision handler
 		handlers.PF_COLLISION = []
 		handlers.AP_COLLISION = []
+		handlers.AF_COLLISION = []
+		if video:
+			vid_from_img(filename)
