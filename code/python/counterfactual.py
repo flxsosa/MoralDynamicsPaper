@@ -8,28 +8,19 @@ import handlers
 from agents import Agent
 from math import sin, cos, radians
 
-def determine_outcome(environment):
-    '''
-    Determines whether a collision occurs within a simulation between
-    a Patient and Fireball.
-    '''
-    environment.run()
-    return environment.patient_fireball_collision, environment.agent_patient_collision
-
-def run_sim(environment):
-    environment = environment(False)
-    environment.run()
-    return environment.agent.effort_expended
-
-def counterfactual_simulation(true_outcome,environment,tick,std_dev,num_times):
+def counterfactual_simulation(environment,std_dev,num_times,view=False):
     # Determine counterfactual probability
-    # TODO: Cancel counterfactual simulations if there is no agent-patient
     #   collision
     counterfactual_prob = 0.0
+    true_env = environment(view)
+    true_env.run()
+    true_outcome = true_env.patient_fireball_collision
     for _ in range(num_times):
-        env = environment(False)
+        env = environment(view)
+        env.agent_patient_collision = true_env.agent_patient_collision
+        env.agent_fireball_collision = true_env.agent_fireball_collision
         # Run the counterfactual simulation
-        env.counterfactual_run(std_dev,tick)
+        env.counterfactual_run(std_dev)
         # Determine outcome
         counterfactual_outcome = env.patient_fireball_collision
         counterfactual_prob += int(true_outcome == counterfactual_outcome)
@@ -37,33 +28,26 @@ def counterfactual_simulation(true_outcome,environment,tick,std_dev,num_times):
 
 def iterate_std_dev(environment,start,end,step,num_times):
     # Retrieve true oucome of simulation w/o noise
-    true_outcome, collision_tick = determine_outcome(environment(False))
     std_dev_prob_map = {}
     for std_dev in range(start,end,step):
-        counterfactual_prob = counterfactual_simulation(true_outcome,
-                                                        environment,
-                                                        collision_tick,
+        counterfactual_prob = counterfactual_simulation(environment,
                                                         std_dev,num_times)
         std_dev_prob_map[std_dev] = counterfactual_prob
     return std_dev_prob_map
 
 def run():
-    # for scene in scenarios.__experiment3__:
-    #     print("==== Simulation ==== ", scene)
-    #     sim = getattr(scenarios, scene)
-    #     m = iterate_std_dev(sim,start=10,end=110,step=10,num_times=100)
-    #     print("   ", m)
-
     for scene in scenarios.__experiment3__:
-        print("==== Simulation ==== ", scene)
         sim = getattr(scenarios, scene)
-        m = run_sim(sim)
-        print(m)
-
+        true_env = sim(True)
+        true_env.run()
+        env = sim(True)
+        env.agent_patient_collision = true_env.agent_patient_collision
+        env.agent_fireball_collision = true_env.agent_fireball_collision
+        env.counterfactual_run(1, "counter_1"+scene)
 
 def run_rotate():
 
-    def rotate(obj,theta=20,origin=(500,300)):
+    def rotate(obj,theta=-20,origin=(500,300)):
         '''
         Rotates objects about a center
         '''
@@ -78,7 +62,7 @@ def run_rotate():
         # Translate w/r to actual origin (0,0)
         obj.body.position += Vec2d(origin)
 
-    for scene in [scenarios.__experiment3__[0]]:
+    for scene in [scenarios.__experiment3__[14]]:
         sim = getattr(scenarios, scene)
         env = sim(True)
         env.run()
@@ -128,4 +112,4 @@ def run_rotate():
                 space.step(1/60.0)
             except Exception as e:
                 running = False
-run_rotate()
+run()
