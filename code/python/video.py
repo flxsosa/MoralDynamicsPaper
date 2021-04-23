@@ -7,6 +7,11 @@ import os
 pygame.init()
 
 def make_video(screen):
+    '''
+    Generates screenshots from a simulation
+
+    screen::screen -- a pygame screen on which the simulation is rendered
+    '''
     img_num = 0
     while True:
         img_num += 1
@@ -16,6 +21,12 @@ def make_video(screen):
         yield
 
 def vid_from_img(name="sim",dir="*.jpg"):
+    '''
+    Takes images generated from make_video and stitches them into a video
+
+    name::str -- name of the simulation for file naming
+    dir::str  -- parameter for globbing the files together
+    '''
     img_dic = {}
     img_str = []
     size = 0,0
@@ -26,7 +37,7 @@ def vid_from_img(name="sim",dir="*.jpg"):
         img_str.append(filename)
         img_dic[filename] = img
 
-    out = cv2.VideoWriter(name+'.mp4', cv2.VideoWriter_fourcc(*'DIVX'),60, size)
+    out = cv2.VideoWriter(name+'.mp4', cv2.VideoWriter_fourcc(*'DIVX'),50, size)
     img_str.sort()
 
     for i in img_str:

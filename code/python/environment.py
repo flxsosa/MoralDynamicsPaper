@@ -18,14 +18,14 @@ class Environment:
 		Environment class that contains all necessary components to configure
 		and run scenarios.
 
-		a_params -- parameters for the Blue Agent
-		p_params -- parameters for the Green Agent
-		f_params -- parameters for the Fireball
-		vel 	 -- velcoties associated with each agent in the scenario
-		handlers -- optional collision handlers
-		view 	 -- flag for whether you want to view the scenario or not
-		frict 	 -- friction value for pymunk physics
-		std_dev  -- standard deviation value for noisy counterfactual simulation
+		a_params::dict -- parameters for the Blue Agent
+		p_params::dict -- parameters for the Green Agent
+		f_params::dict -- parameters for the Fireball
+		vel::tuple     -- velcoties associated with each agent in the scenario
+		handlers::tuple -- optional collision handlers
+		view::bool     -- flag for whether you want to view the scenario or not
+		frict::float   -- friction value for pymunk physics
+		std_dev::float -- standard deviation value for noisy counterfactual simulation
 		'''
 		self.view = view
 		self.std_dev = std_dev
@@ -127,6 +127,9 @@ class Environment:
 		'''
 		Forward method for Environments. Actually runs the scenarios you
 		view on (or off) screen.
+
+		video::bool   -- whether you want to record the simulation
+		filename::str -- the name of the video file
 		'''
 		# Agent velocities
 		a_vel, p_vel, f_vel = self.vel
@@ -164,8 +167,6 @@ class Environment:
 				if video:
 					next(save_screen)
 			except Exception as e:
-				print(repr(e))
-				print("End")
 				running = False
 		if self.view:
 			pygame.quit()
@@ -179,20 +180,27 @@ class Environment:
 		if video:
 			vid_from_img(filename)
 
-	def counterfactual_run(self,std_dev,filename):
+	def counterfactual_run(self,std_dev,video=False,filename=''):
 		'''
 		Forward method for Environments. Actually runs the scenarios you
 		view on (or off) screen.
+
+		std_dev::float -- noise parameter for simulation
+		video::bool    -- whether you want to record the simulation
+		filename::str  -- file name for video
 		'''
-		video = True
+		# We remove the agent from the environment
 		self.space.remove(self.space.shapes[0])
 		self.space.remove(self.space.bodies[0])
+		# Reinitialize pygame
 		pygame.init()
+		# If viewing, draw simulaiton to screen
 		if self.view:
 			pygame.init()
 			self.screen = pygame.display.set_mode((1000,600))
 			self.options = pymunk.pygame_util.DrawOptions(self.screen)
 			self.clock = pygame.time.Clock()
+		# Set noise parameter
 		self.std_dev = std_dev
 		save_screen = make_video(self.screen)
 		# Agent velocities

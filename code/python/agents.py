@@ -47,7 +47,9 @@ class Agent:
 			'RS':self.move_right_special,
 			'NS':self.do_nothing_special,
 			'NS2':self.do_nothing_special_2,
-			'LD' :self.move_left_diag
+			'LD' :self.move_left_diag,
+			'P' :self.push_right,
+			'PS' :self.push_right_slow
 		}
 		# Agent attributes
 		self.body = pymunk.Body(mass,1)
@@ -58,6 +60,7 @@ class Agent:
 		self.shape.elasticity = 1
 		self.effort_expended = 0
 		self.actions = [self.action_dict[x] for x in moves]
+		self.moves = moves
 		self.tick = 0
 		self.counterfactual_tick = None
 
@@ -77,9 +80,10 @@ class Agent:
 					std_dev = 0
 				elif self.counterfactual_tick and self.tick >= self.counterfactual_tick:
 					std_dev = tmp_std
-				direction = tgt_pos - self.body.position
+				direction = [intended_x_pos,self.body.position[1]] - self.body.position
 				direction = direction.normalized()
-				direction += gauss(0,std_dev)
+				noise = [gauss(0,std_dev), gauss(0,std_dev)]
+				direction += noise
 				direction = direction.normalized()
 				impulse = (velocity - self.body.velocity.length)*direction
 				self.body.apply_impulse_at_local_point(impulse)
@@ -89,7 +93,6 @@ class Agent:
 	def move_left(self,velocity,clock,screen,space,options,view,std_dev=0):
 		# Move agent left
 		intended_x_pos = self.body.position[0]-move_lat_distance
-		tgt_pos = [intended_x_pos,self.body.position[1]]
 		tmp_std = std_dev
 		std_dev = 0
 		while self.body.position[0] > intended_x_pos:
@@ -101,9 +104,10 @@ class Agent:
 					std_dev = 0
 				elif self.counterfactual_tick and self.tick >= self.counterfactual_tick:
 					std_dev = tmp_std
-				direction = tgt_pos - self.body.position
+				direction = [intended_x_pos,self.body.position[1]] - self.body.position
 				direction = direction.normalized()
-				direction += gauss(0,std_dev)
+				noise = [gauss(0,std_dev), gauss(0,std_dev)]
+				direction += noise
 				direction = direction.normalized()
 				impulse = (velocity - self.body.velocity.length)*direction
 				self.body.apply_impulse_at_local_point(impulse)
@@ -125,9 +129,10 @@ class Agent:
 					std_dev = 0
 				elif self.counterfactual_tick and self.tick >= self.counterfactual_tick:
 					std_dev = tmp_std
-				direction = tgt_pos - self.body.position
+				direction = [self.body.position[0], intended_y_pos] - self.body.position
 				direction = direction.normalized()
-				direction += gauss(0,std_dev)
+				noise = [gauss(0,std_dev), gauss(0,std_dev)]
+				direction += noise
 				direction = direction.normalized()
 				impulse = (velocity - self.body.velocity.length)*direction
 				self.body.apply_impulse_at_local_point(impulse)
@@ -149,9 +154,10 @@ class Agent:
 					std_dev = 0
 				elif self.counterfactual_tick and self.tick >= self.counterfactual_tick:
 					std_dev = tmp_std
-				direction = tgt_pos - self.body.position
+				direction = [self.body.position[0], intended_y_pos] - self.body.position
 				direction = direction.normalized()
-				direction += gauss(0,std_dev)
+				noise = [gauss(0,std_dev), gauss(0,std_dev)]
+				direction += noise
 				direction = direction.normalized()
 				impulse = (velocity - self.body.velocity.length)*direction
 				self.body.apply_impulse_at_local_point(impulse)
@@ -194,9 +200,10 @@ class Agent:
 					std_dev = 0
 				elif self.counterfactual_tick and self.tick >= self.counterfactual_tick:
 					std_dev = tmp_std
-				direction = tgt_pos - self.body.position
+				direction = [intended_x_pos,self.body.position[1]] - self.body.position
 				direction = direction.normalized()
-				direction += gauss(0,std_dev)
+				noise = [gauss(0,std_dev), gauss(0,std_dev)]
+				direction += noise
 				direction = direction.normalized()
 				impulse = (velocity - self.body.velocity.length)*direction
 				self.body.apply_impulse_at_local_point(impulse)
@@ -219,9 +226,10 @@ class Agent:
 					std_dev = 0
 				elif self.counterfactual_tick and self.tick >= self.counterfactual_tick:
 					std_dev = tmp_std
-				direction = tgt_pos - self.body.position
+				direction = [self.body.position[0], intended_y_pos] - self.body.position
 				direction = direction.normalized()
-				direction += gauss(0,std_dev)
+				noise = [gauss(0,std_dev), gauss(0,std_dev)]
+				direction += noise
 				direction = direction.normalized()
 				impulse = (velocity - self.body.velocity.length)*direction
 				self.body.apply_impulse_at_local_point(impulse)
@@ -249,9 +257,10 @@ class Agent:
 					std_dev = 0
 				elif self.counterfactual_tick and self.tick >= self.counterfactual_tick:
 					std_dev = tmp_std
-				direction = tgt_pos - self.body.position
+				direction = [self.body.position[0], intended_y_pos] - self.body.position
 				direction = direction.normalized()
-				direction += gauss(0,std_dev)
+				noise = [gauss(0,std_dev), gauss(0,std_dev)]
+				direction += noise
 				direction = direction.normalized()
 				impulse = (velocity - self.body.velocity.length)*direction
 				self.body.apply_impulse_at_local_point(impulse)
@@ -304,6 +313,58 @@ class Agent:
 					self.body.apply_impulse_at_local_point(impulse)
 					self.effort_expended += impulse.length
 				yield
+
+	def push_right(self, velocity, clock, screen, space, options, view, std_dev=0):
+		# Move agent right
+		intended_x_pos = self.body.position[0]+move_lat_distance
+		tgt_pos = [intended_x_pos,self.body.position[1]]
+		tmp_std = std_dev
+		std_dev = 0
+		while self.body.position[0] < intended_x_pos:
+			multiplier = self.body.position[0]/intended_x_pos*0.8
+			if view:
+				for event in pygame.event.get():
+					pass
+			if self.body.velocity.length < velocity+velocity*multiplier:
+				if self.counterfactual_tick and self.tick < self.counterfactual_tick:
+					std_dev = 0
+				elif self.counterfactual_tick and self.tick >= self.counterfactual_tick:
+					std_dev = tmp_std
+				direction = [intended_x_pos,self.body.position[1]] - self.body.position
+				direction = direction.normalized()
+				noise = [gauss(0,std_dev), gauss(0,std_dev)]
+				direction += noise
+				direction = direction.normalized()
+				impulse = (velocity+velocity*multiplier - self.body.velocity.length)*direction
+				self.body.apply_impulse_at_local_point(impulse)
+				self.effort_expended += impulse.length
+			yield
+
+	def push_right_slow(self, velocity, clock, screen, space, options, view, std_dev=0):
+		# Move agent right
+		intended_x_pos = self.body.position[0]+move_lat_distance
+		tgt_pos = [intended_x_pos,self.body.position[1]]
+		tmp_std = std_dev
+		std_dev = 0
+		while self.body.position[0] < intended_x_pos:
+			multiplier = self.body.position[0]/intended_x_pos*0.5
+			if view:
+				for event in pygame.event.get():
+					pass
+			if self.body.velocity.length < velocity+velocity*multiplier:
+				if self.counterfactual_tick and self.tick < self.counterfactual_tick:
+					std_dev = 0
+				elif self.counterfactual_tick and self.tick >= self.counterfactual_tick:
+					std_dev = tmp_std
+				direction = [intended_x_pos,self.body.position[1]] - self.body.position
+				direction = direction.normalized()
+				noise = [gauss(0,std_dev), gauss(0,std_dev)]
+				direction += noise
+				direction = direction.normalized()
+				impulse = (velocity+velocity*multiplier - self.body.velocity.length)*direction
+				self.body.apply_impulse_at_local_point(impulse)
+				self.effort_expended += impulse.length
+			yield
 
 	def act(self,velocity,clock,screen,space,options,view,std_dev=0):
 		# Execute policy

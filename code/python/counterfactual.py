@@ -7,14 +7,27 @@ from pygame.locals import *
 import handlers
 from agents import Agent
 from math import sin, cos, radians
+from video import vid_from_img, make_video
+from random import choice
 
 def counterfactual_simulation(environment,std_dev,num_times,view=False):
+    '''
+    Runs the counterfactual simulation and returns the causality judgment
+    for the agent.
+
+    environment::env -- simulation to be run
+    std_dev::float   -- noise of counterfactual simulation
+    num_times::int   -- number of samples to draw from noisy simulation
+    view::bool       -- render simulation or not
+    '''
     # Determine counterfactual probability
     #   collision
     counterfactual_prob = 0.0
+    # Gather true/factual environment outcome
     true_env = environment(view)
     true_env.run()
     true_outcome = true_env.patient_fireball_collision
+    # Sample noisy simulation
     for _ in range(num_times):
         env = environment(view)
         env.agent_patient_collision = true_env.agent_patient_collision
@@ -24,29 +37,13 @@ def counterfactual_simulation(environment,std_dev,num_times,view=False):
         # Determine outcome
         counterfactual_outcome = env.patient_fireball_collision
         counterfactual_prob += int(true_outcome == counterfactual_outcome)
-    return counterfactual_prob / num_times
-
-def iterate_std_dev(environment,start,end,step,num_times):
-    # Retrieve true oucome of simulation w/o noise
-    std_dev_prob_map = {}
-    for std_dev in range(start,end,step):
-        counterfactual_prob = counterfactual_simulation(environment,
-                                                        std_dev,num_times)
-        std_dev_prob_map[std_dev] = counterfactual_prob
-    return std_dev_prob_map
-
-def run():
-    for scene in scenarios.__experiment3__:
-        sim = getattr(scenarios, scene)
-        true_env = sim(True)
-        true_env.run()
-        env = sim(True)
-        env.agent_patient_collision = true_env.agent_patient_collision
-        env.agent_fireball_collision = true_env.agent_fireball_collision
-        env.counterfactual_run(1, "counter_1"+scene)
+    return 1- counterfactual_prob / num_times
 
 def run_rotate():
-
+    '''
+    Runs the simulations and saves the JSON files with an arbitrary rotation
+    about the center of the screen.
+    '''
     def rotate(obj,theta=-20,origin=(500,300)):
         '''
         Rotates objects about a center
@@ -62,7 +59,10 @@ def run_rotate():
         # Translate w/r to actual origin (0,0)
         obj.body.position += Vec2d(origin)
 
-    for scene in [scenarios.__experiment3__[14]]:
+    video = False
+    thetas = list(range(-19,-9))+list(range(10,19))
+    for scene in scenarios.__experiment3__:
+        theta = choice(thetas)
         sim = getattr(scenarios, scene)
         env = sim(True)
         env.run()
@@ -78,6 +78,8 @@ def run_rotate():
         screen = pygame.display.set_mode((1000,600))
         options = pymunk.pygame_util.DrawOptions(screen)
         clock = pygame.time.Clock()
+        if video:
+            save_screen = make_video(screen)
         # Setup empty agents
         agent = Agent(0,0,'blue',0,[])
         patient = Agent(0,0,'green',0,[])
@@ -90,7 +92,7 @@ def run_rotate():
         running = True
 
         while running:
-            # if not handlers.AP_COLLISION: self.agent_patient_collision = self.tick
+            # print(agent_positions[0])
             try:
                 # Extract position data
                 a_pos = agent_positions.pop(0)
@@ -101,15 +103,21 @@ def run_rotate():
                 patient.body.position = Vec2d(p_pos['x'],p_pos['y'])
                 fireball.body.position = Vec2d(f_pos['x'],f_pos['y'])
                 # Rotate objects about the center
-                rotate(agent)
-                rotate(patient)
-                rotate(fireball)
+                rotate(agent,theta)
+                rotate(patient,theta)
+                rotate(fireball,theta)
                 # Render space on screen (if requested)
                 screen.fill((255,255,255))
                 space.debug_draw(options)
                 pygame.display.flip()
                 clock.tick(60)
                 space.step(1/60.0)
+                if video:
+                    next(save_screen)
             except Exception as e:
                 running = False
-run()
+        pygame.quit()
+        pygame.display.quit()
+        if video:
+            vid_from_img("final_"+scene)
+

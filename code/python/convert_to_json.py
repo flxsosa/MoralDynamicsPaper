@@ -1,69 +1,81 @@
 import json
 import sys
 import pygame
-
-from moral_kinematics_scenarios import harm_moving_moving,harm_moving_static, \
-									harm_static_moving, harm_static_static, \
-									victim_moving_moving, victim_moving_static, \
-									victim_static_moving, victim_static_static, \
-									long_distance, dodge, bystander, stays_put, \
-									short_distance, med_push, long_push, \
-									push_patient, double_push, bot_check
-
-moral_kinematics_scenarios = [harm_moving_moving,harm_moving_static,
-								harm_static_moving, harm_static_static,
-								victim_moving_moving, victim_moving_static,
-								victim_static_moving, victim_static_static,
-								long_distance, dodge, bystander, stays_put,
-								short_distance, med_push, long_push,
-								push_patient, double_push, bot_check]
-
-# Create list of lists of scenarios
-list_of_scenarios = [moral_kinematics_scenarios]
-
-# Names of lists
-names = ['mk']
-
+import moral_kinematics_scenarios as scenarios
+from random import choice
+from math import sin, cos, radians
+from pymunk.vec2d import Vec2d
 # Path to save JSON data to
-path = '../../data/json/'
+path = '../../data/json/experiment1/'
 
-def convert(environment, path=""):
+def rotate_positions(d,theta):
+	def rotate(x,y,theta,origin=[500,300]):
+		'''
+		Rotates objects about a center
+		'''
+		# Translate w/r to visual origin (500,300)
+		pos = Vec2d(x,y)
+		pos -= Vec2d(origin)
+		# Radians to degrees
+		theta = radians(theta)
+		x, y = pos
+		x_ = x*cos(theta) - y*sin(theta)
+		y_ = y*cos(theta) + x*sin(theta)
+		pos = Vec2d(x_,y_)
+		# Translate w/r to actual origin (0,0)
+		pos += Vec2d(origin)
+		return pos
+
+	for obj in d.keys():
+		for pos in d[obj]:
+			pos['x'], pos['y'] = rotate(pos['x'], pos['y'],theta)
+
+def convert(rotate=False, path=""):
 	'''
-	Takes in an environment, runs the simulation, and outputs
-	the positional information of all agents within the simulation
+	Takes in a list of simulations, runs the simulations, and outputs
+	the positional information of all agents within the simulations
 	in a JSON format stored in /data/json/.
-
-	environment -- simulation to be run and recorded
-	path 		-- path to JSON directory
 	'''
-	# Init environment
-	env = environment(view=False)
+	def count_nothing(moves):
+		return moves.count('N')+moves.count('NS')+moves.count('NS2')
+	thetas = list(range(-19,-9))+list(range(10,19))
+	for scene in scenarios.__experiment1__:
+		theta = choice(thetas)
+		sim = getattr(scenarios,scene)
+		env = sim(False)
+		env.run()
 
-	# Set up config for json file
-	sim_dict = {} # Dict to be converted to json
-	config = {'scene' : env.screen_size[0]} # Screen size (y-axis)
-	config['name'] = environment.__name__ # Name of scenario
+		# Set up config for json file
+		sim_dict = {} # Dict to be converted to json
+		config = {'scene' : env.screen_size[0]} # Screen size (y-axis)
+		config['name'] = scene # Name of scenario
+		config['collision_agent_patient'] = bool(env.agent_patient_collision)
+		config['collision_agent_fireball'] = bool(env.agent_fireball_collision)
+		# TODO: This might be too coarse (i.e. init movement might be later)
+		config['agent_init_moving'] = (count_nothing(env.agent.moves) != len(env.agent.moves))
+		config['patient_init_moving'] = (count_nothing(env.patient.moves) != len(env.patient.moves))
+		config['fireball_init_moving'] = (count_nothing(env.fireball.moves) != len(env.fireball.moves))
+		# Init dictionaries for body positions
+		bodies_dict = {}
 
-	# Init dictionaries for body positions
-	bodies_dict = {}
+		# Gather positional data on objects and add to dict
+		if rotate:
+			rotate_positions(env.position_dict,theta)
+			bodies_dict["agent"] = env.position_dict['agent']
+			bodies_dict["patient"] = env.position_dict['patient']
+			bodies_dict["fireball"] = env.position_dict['fireball']
+		else:
+			bodies_dict["agent"] = env.position_dict['agent']
+			bodies_dict["patient"] = env.position_dict['patient']
+			bodies_dict["fireball"] = env.position_dict['fireball']
 
-	# Gather positional data on objects and add to dict
-	bodies_dict["agent"] = env.position_dict['agent']
-	bodies_dict["patient"] = env.position_dict['patient']
-	bodies_dict["fireball"] = env.position_dict['fireball']
+		# Convert dict to json
+		config['ticks'] = env.tick
+		sim_dict['config'] = config
+		sim_dict["objects"] = bodies_dict
 
-	# Convert dict to json
-	config['ticks'] = env.tick
-	sim_dict['config'] = config
-	sim_dict["objects"] = bodies_dict
+		# Save json
+		with open(path+config['name']+".json", "w") as j:
+			json.dump(sim_dict, j, indent=2)
 
-	# Save json
-	with open(path+config['name']+".json", "w") as j:
-		json.dump(sim_dict, j, indent=2)
-
-# # Loop through all simulations and convert them into JSON
-# for scenarios in list_of_scenarios:
-# 	scenario_type = names[0]
-# 	for scene in scenarios:
-# 		convert(scene, path)
-convert(moral_kinematics_scenarios[-1])
+convert(False,path)
