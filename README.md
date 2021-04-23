@@ -16,20 +16,26 @@ When holding others morally responsible, we care about what they did, and what t
 │   ├── R
 │   ├── javascript
 │   │   ├── experiment_1
-│   │   └── experiment_2
+│   │   ├── experiment_2
+│   │   └── experiment_3
 │   ├── om
 │   └── python
 ├── data
 │   ├── empirical
 │   ├── json
+│   │   ├── experiment_1
+│   │   ├── experiment_2
+│   │   └── experiment_3
 │   └── model
 ├── figures
 │   └── plots
 │       ├── experiment_1
-│       └── experiment_2
+│       ├── experiment_2
+│       └── experiment_3
 └── videos
     ├── experiment_1
-    └── experiment_2
+    ├── experiment_2
+    └── experiment_3
 ```
 
 ## Code
@@ -47,16 +53,19 @@ Contains all of the code used to analyze and visualize our data.
 Contains all of the code used to develop the physical simulations for our experiments and model.
 * ```agents.py``` contains base classes for the agents in our simulations
 * ```environment.py``` contains base classes for the simulation environments
-* ```handlers.py``` contains necessary collsion handlers for the physics engine
-* ```record.py``` contains methods for recording predictions from our model
+* ```handlers.py``` contains necessary collision handlers for the physics engine
+* ```record.py``` contains functions for recording predictions from our model
 * ```convert_to_json.py``` contains methods for converting physics data from our simulation into a JSON
 * ```moral_kinematics_scenarios.py``` contains the defined simulations we used in our paper
+* ```features.py``` contains all of the functions for computing kinematic features from simulation JSON data
+* ```video.py``` contains all of the functions for recording the simulations as videos
 
 ### Javascript
 
 Contains all of the code for our MTurk experiments.
 * ```experiment_1``` contains all code used for our first behavioral experiment
-* ```experiment_2``` contains all code used for out second behavioral experiment
+* ```experiment_2``` contains all code used for our second behavioral experiment
+* ```experiment_3``` contains all code used for our third behavioral experiment
 
 ### Blender
 
@@ -67,7 +76,7 @@ Contains the code used to render our physical simulations into videos using Blen
 This directory contains all of the emirical and model data related to the project.
 * ```empirical``` contains all empirical data from experiments 1 and 2
 * ```model``` contains all model predictions
-* ```json``` contains JSON files containing positional data of the agents within our simulations*
+* ```json``` contains JSON files containing positional data of the agents within our simulations
 
 ## Figures
 
