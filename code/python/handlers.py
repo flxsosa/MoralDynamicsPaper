@@ -35,7 +35,6 @@ def ap0(arbiter, space, data):
 	'''
 	Used with post_solve. Determines if Agent
 	and Patient have collided.
-	Expected that Green Agent is in space.shapes[1].
 
 	arbiter -- Pymunk collision arbiter
 	space   -- Pymunk space in which simulations are run
@@ -49,8 +48,7 @@ def ap0(arbiter, space, data):
 def af0(arbiter, space, data):
 	'''
 	Used with post_solve. Determines if Agent
-	and Patient have collided.
-	Expected that Green Agent is in space.shapes[1].
+	and Fireball have collided.
 
 	arbiter -- Pymunk collision arbiter
 	space   -- Pymunk space in which simulations are run

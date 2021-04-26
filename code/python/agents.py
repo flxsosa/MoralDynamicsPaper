@@ -14,6 +14,13 @@ move_long_distance = 160
 wait_period = 27
 
 def is_inside(body_pos, tgt_pos):
+	'''
+	Helper function that determines whether an object is within the
+	bounds of some position, to some degree eps
+
+	body_pos::Vec2d -- position of object
+	tgt_pos::Vec2s  -- target position
+	'''
 	eps = 2
 	return (body_pos[0] < (tgt_pos[0] + eps) and
 		body_pos[0] > (tgt_pos[0] - eps) and
@@ -26,13 +33,13 @@ class Agent:
 		Class for agents in scenarios. Used to instantiate the Blue Agent,
 		Green Agent, and Fireball in the Moral Dynamics project.
 
-		x -- x dimension of initial location in a scenario
-		y -- y dimension of initial location in a scenario
-		color -- agent's color
-		collision -- collision type for agent body (used in pymunk)
-		moves -- actions the agent will take for a given scenario
-		mass  -- optional mass parameter for agent's body
-		rad   -- optional radius for agent's body
+		x::float -- x dimension of initial location in a scenario
+		y::float -- y dimension of initial location in a scenario
+		color::str -- agent's color
+		collision::int -- collision type for agent body (used in pymunk)
+		moves::list -- actions the agent will take for a given scenario
+		mass::float  -- optional mass parameter for agent's body
+		rad::float   -- optional radius for agent's body
 		'''
 		# Actions available to agents
 		self.action_dict = {

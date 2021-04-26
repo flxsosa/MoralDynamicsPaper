@@ -31,14 +31,14 @@ class Environment:
 		self.std_dev = std_dev
 		# Objects in environent
 		self.agent = Agent(a_params['loc'][0], a_params['loc'][1], 
-					a_params['color'], a_params['coll'],
-					a_params['moves'])
+				   a_params['color'], a_params['coll'],
+				   a_params['moves'])
 		self.patient = Agent(p_params['loc'][0], p_params['loc'][1], 
-					p_params['color'], p_params['coll'],
-					p_params['moves'])
+				     p_params['color'], p_params['coll'],
+				     p_params['moves'])
 		self.fireball = Agent(f_params['loc'][0], f_params['loc'][1], 
-					f_params['color'], f_params['coll'],
-					f_params['moves'])
+				      f_params['color'], f_params['coll'],
+				      f_params['moves'])
 		# Initial location of objects in environment
 		self.p_loc = p_params['loc']
 		self.a_loc = a_params['loc']
@@ -135,11 +135,14 @@ class Environment:
 		a_vel, p_vel, f_vel = self.vel
 		# Agent action generators (yield actions of agents)
 		a_generator = self.agent.act(a_vel,self.clock,self.screen,
-					     self.space,self.options, self.view,self.std_dev)
+					     self.space,self.options, self.view,
+					     self.std_dev)
 		p_generator = self.patient.act(p_vel,self.clock,self.screen,
-					       self.space,self.options,self.view,self.std_dev)
+					       self.space,self.options,self.view,
+					       self.std_dev)
 		f_generator = self.fireball.act(f_vel,self.clock,self.screen,
-						self.space,self.options,self.view,self.std_dev)
+						self.space,self.options,self.view,
+						self.std_dev)
 		# Running flag
 		running = True
 		# Video creation
@@ -147,6 +150,7 @@ class Environment:
 		# Main loop. Run simulation until collision between Green Agent 
 		# 	and Fireball
 		while running and not handlers.PF_COLLISION:
+			print(self.agent_patient_collision)
 			# if not handlers.AP_COLLISION: self.agent_patient_collision = self.tick
 			try:
 				# Generate the next tick in the simulation for each object
@@ -210,9 +214,11 @@ class Environment:
 		self.fireball.counterfactual_tick = self.agent_fireball_collision
 		# Agent action generators (yield actions of agents)
 		p_generator = self.patient.act(p_vel, self.clock, self.screen,
-						self.space, self.options, self.view, self.std_dev)
+					       self.space, self.options, self.view,
+					       self.std_dev)
 		f_generator = self.fireball.act(f_vel, self.clock, self.screen,
-						self.space, self.options, self.view, self.std_dev)
+						self.space, self.options, self.view,
+						self.std_dev)
 		# Running flag
 		running = True
 		# Main loop. Run simulation until collision between Green Agent

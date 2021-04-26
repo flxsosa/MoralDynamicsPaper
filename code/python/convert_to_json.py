@@ -6,9 +6,16 @@ from random import choice
 from math import sin, cos, radians
 from pymunk.vec2d import Vec2d
 # Path to save JSON data to
-path = '../../data/json/experiment1/'
+path = '../../data/json/experiment3/'
 
 def rotate_positions(d,theta):
+	'''
+	Rotates the position of the objecs about the center of the
+	environment
+
+	d::dict -- dictionary of all object positions
+	theta::int -- degress of rotation
+	'''
 	def rotate(x,y,theta,origin=[500,300]):
 		'''
 		Rotates objects about a center
@@ -39,7 +46,7 @@ def convert(rotate=False, path=""):
 	def count_nothing(moves):
 		return moves.count('N')+moves.count('NS')+moves.count('NS2')
 	thetas = list(range(-19,-9))+list(range(10,19))
-	for scene in scenarios.__experiment1__:
+	for scene in scenarios.__experiment3__:
 		theta = choice(thetas)
 		sim = getattr(scenarios,scene)
 		env = sim(False)
@@ -51,7 +58,6 @@ def convert(rotate=False, path=""):
 		config['name'] = scene # Name of scenario
 		config['collision_agent_patient'] = bool(env.agent_patient_collision)
 		config['collision_agent_fireball'] = bool(env.agent_fireball_collision)
-		# TODO: This might be too coarse (i.e. init movement might be later)
 		config['agent_init_moving'] = (count_nothing(env.agent.moves) != len(env.agent.moves))
 		config['patient_init_moving'] = (count_nothing(env.patient.moves) != len(env.patient.moves))
 		config['fireball_init_moving'] = (count_nothing(env.fireball.moves) != len(env.fireball.moves))
@@ -77,5 +83,3 @@ def convert(rotate=False, path=""):
 		# Save json
 		with open(path+config['name']+".json", "w") as j:
 			json.dump(sim_dict, j, indent=2)
-
-convert(False,path)
