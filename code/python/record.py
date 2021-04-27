@@ -206,8 +206,6 @@ def record_features():
                   "../../data/json/experiment3/"]
     for exp_idx in range(len(exp_clips)):
         for clip in exp_clips[exp_idx]:
-            print(clip, exp_idx, collision_agent_patient(json_files[exp_idx]+
-                                               clip+".json"))
             row = [exp_idx+1]
             row.append(clip)
             row.append(distance(json_files[exp_idx]+clip+".json"))
@@ -238,7 +236,7 @@ def rename(csv):
     del results["Unnamed: 0"] # Not sure, but this shows up from read_csv
     results.to_csv(csv)
 
-# record_features()
+record_features()
 rename('../../data/model/model_features.csv')
 rename('../../data/model/model_effort.csv')
 rename('../../data/model/model_causality.csv')
