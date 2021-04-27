@@ -5,9 +5,15 @@ import moral_kinematics_scenarios as scenarios
 from random import choice
 from math import sin, cos, radians
 from pymunk.vec2d import Vec2d
+from importlib import import_module
 # Path to save JSON data to
-path = '../../data/json/experiment3/'
-
+paths = ['../../data/json/experiment1/',
+	 '../../data/json/experiment2/',
+	 '../../data/json/experiment3/']
+scenarios = import_module('moral_kinematics_scenarios')
+experiment_clips = [scenarios.__experiment1__,
+		    scenarios.__experiment2__,
+                    scenarios.__experiment3__]
 def rotate_positions(d,theta):
 	'''
 	Rotates the position of the objecs about the center of the
@@ -51,40 +57,42 @@ def convert(rotate=False, path=""):
 		'''
 		return moves.count('N')+moves.count('NS')+moves.count('NS2')+moves.count('S')
 	thetas = list(range(-19,-9))+list(range(10,19))
-	for scene in scenarios.__experiment3__:
-		theta = choice(thetas)
-		sim = getattr(scenarios,scene)
-		env = sim(False)
-		env.run()
+	for idx in range(len(paths)):
+		for scene in experiment_clips[idx]:
+			theta = choice(thetas)
+			sim = getattr(scenarios,scene)
+			env = sim(False)
+			env.run()
 
-		# Set up config for json file
-		sim_dict = {} # Dict to be converted to json
-		config = {'scene' : env.screen_size[0]} # Screen size (y-axis)
-		config['name'] = scene # Name of scenario
-		config['collision_agent_patient'] = bool(env.agent_patient_collision)
-		config['collision_agent_fireball'] = bool(env.agent_fireball_collision)
-		config['agent_init_moving'] = (count_nothing(env.agent.moves) != len(env.agent.moves))
-		config['patient_init_moving'] = (count_nothing(env.patient.moves) != len(env.patient.moves))
-		config['fireball_init_moving'] = (count_nothing(env.fireball.moves) != len(env.fireball.moves))
-		# Init dictionaries for body positions
-		bodies_dict = {}
+			# Set up config for json file
+			sim_dict = {} # Dict to be converted to json
+			config = {'scene' : env.screen_size[0]} # Screen size (y-axis)
+			config['name'] = scene # Name of scenario
+			config['collision_agent_patient'] = bool(env.agent_patient_collision)
+			config['collision_agent_fireball'] = bool(env.agent_fireball_collision)
+			config['agent_init_moving'] = (count_nothing(env.agent.moves) != len(env.agent.moves))
+			config['patient_init_moving'] = (count_nothing(env.patient.moves) != len(env.patient.moves))
+			config['fireball_init_moving'] = (count_nothing(env.fireball.moves) != len(env.fireball.moves))
+			# Init dictionaries for body positions
+			bodies_dict = {}
 
-		# Gather positional data on objects and add to dict
-		if rotate:
-			rotate_positions(env.position_dict,theta)
-			bodies_dict["agent"] = env.position_dict['agent']
-			bodies_dict["patient"] = env.position_dict['patient']
-			bodies_dict["fireball"] = env.position_dict['fireball']
-		else:
-			bodies_dict["agent"] = env.position_dict['agent']
-			bodies_dict["patient"] = env.position_dict['patient']
-			bodies_dict["fireball"] = env.position_dict['fireball']
+			# Gather positional data on objects and add to dict
+			if rotate:
+				rotate_positions(env.position_dict,theta)
+				bodies_dict["agent"] = env.position_dict['agent']
+				bodies_dict["patient"] = env.position_dict['patient']
+				bodies_dict["fireball"] = env.position_dict['fireball']
+			else:
+				bodies_dict["agent"] = env.position_dict['agent']
+				bodies_dict["patient"] = env.position_dict['patient']
+				bodies_dict["fireball"] = env.position_dict['fireball']
 
-		# Convert dict to json
-		config['ticks'] = env.tick
-		sim_dict['config'] = config
-		sim_dict["objects"] = bodies_dict
+			# Convert dict to json
+			config['ticks'] = env.tick
+			sim_dict['config'] = config
+			sim_dict["objects"] = bodies_dict
 
-		# Save json
-		with open(path+config['name']+".json", "w") as j:
-			json.dump(sim_dict, j, indent=2)
+			# Save json
+			with open(paths[idx]+config['name']+".json", "w") as j:
+				json.dump(sim_dict, j, indent=2)
+convert()
