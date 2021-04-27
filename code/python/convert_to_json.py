@@ -44,7 +44,12 @@ def convert(rotate=False, path=""):
 	in a JSON format stored in /data/json/.
 	'''
 	def count_nothing(moves):
-		return moves.count('N')+moves.count('NS')+moves.count('NS2')
+		'''
+		Counts number of moves in which object does not move
+
+		moves::list -- the moves the object has been assigned
+		'''
+		return moves.count('N')+moves.count('NS')+moves.count('NS2')+moves.count('S')
 	thetas = list(range(-19,-9))+list(range(10,19))
 	for scene in scenarios.__experiment3__:
 		theta = choice(thetas)
