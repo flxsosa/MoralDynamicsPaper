@@ -150,8 +150,6 @@ class Environment:
 		# Main loop. Run simulation until collision between Green Agent 
 		# 	and Fireball
 		while running and not handlers.PF_COLLISION:
-			print(self.agent_patient_collision)
-			# if not handlers.AP_COLLISION: self.agent_patient_collision = self.tick
 			try:
 				# Generate the next tick in the simulation for each object
 				next(a_generator)
