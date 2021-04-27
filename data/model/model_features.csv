@@ -2,7 +2,7 @@
 0,1,video3,699.8837368012322,0.2666666666666666,True,1,True,False,False,True,False
 1,1,video7,159.8636698236347,0.0,False,0,True,True,False,False,False
 2,1,video12,0.0,0.0,False,0,False,True,False,False,False
-3,1,video4,0.3936389814843302,0.1066666666666666,True,1,True,True,False,True,False
+3,1,video4,0.3936389814843302,0.1066666666666666,True,1,False,True,False,True,False
 4,1,video1,63.91088796042379,0.2133333333333333,True,1,True,False,False,True,False
 5,1,video9,693.6458274385402,1.5466666666666666,True,1,True,False,False,True,False
 6,1,video10,700.3126962058564,3.013333333333333,True,1,True,False,False,True,False
@@ -11,10 +11,10 @@
 9,1,video6,331.0578003742189,0.7466666666666667,True,1,True,False,False,True,False
 10,1,video5,330.8856495148319,0.9333333333333332,True,1,True,False,False,True,False
 11,1,video2,343.4940599390528,0.0266666666666666,True,1,True,True,False,True,False
-12,2,video3,699.8837368012322,0.2666666666666666,True,1,True,False,False,False,False
+12,2,video3,699.8837368012322,0.2666666666666666,True,1,True,False,False,True,False
 13,2,video7,159.8636698236347,0.0,False,0,True,True,False,False,False
 14,2,video12,0.0,0.0,False,0,False,True,False,False,False
-15,2,video4,0.3936389814843302,0.1066666666666666,True,1,True,True,False,True,False
+15,2,video4,0.3936389814843302,0.1066666666666666,True,1,False,True,False,True,False
 16,2,video1,63.91088796042379,0.2133333333333333,True,1,True,False,False,True,False
 17,2,video9,693.6458274385402,1.5466666666666666,True,1,True,False,False,True,False
 18,2,video10,700.3126962058564,3.013333333333333,True,1,True,False,False,True,False
@@ -30,8 +30,8 @@
 28,2,victim_static_static,415.1997368884234,0.7999999999999999,True,1,True,False,False,True,False
 29,3,video13,159.8636698236347,0.0,False,0,True,True,False,False,False
 30,3,video14,0.0,0.0,False,0,False,True,False,False,False
-31,3,video1,0.3936389814843302,0.1066666666666666,True,1,True,True,False,True,False
-32,3,video2,0.3936389814843302,0.0,False,0,True,False,True,False,True
+31,3,video1,0.3936389814843302,0.1066666666666666,True,1,False,True,False,True,False
+32,3,video2,0.3936389814843302,0.0,False,0,False,False,True,False,True
 33,3,video3,63.91088796042379,0.2133333333333333,True,1,True,False,False,True,False
 34,3,video7,700.3126962058564,3.013333333333333,True,1,True,False,False,True,False
 35,3,video12,498.8056819625944,1.68,True,2,True,False,False,True,False
