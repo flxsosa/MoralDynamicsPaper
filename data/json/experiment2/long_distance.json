@@ -2,7 +2,7 @@
   "config": {
     "scene": 1000,
     "name": "long_distance",
-    "collision_agent_patient": false,
+    "collision_agent_patient": true,
     "collision_agent_fireball": false,
     "agent_init_moving": true,
     "patient_init_moving": false,

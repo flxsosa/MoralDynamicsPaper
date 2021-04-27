@@ -4,7 +4,7 @@
     "name": "stays_put_red",
     "collision_agent_patient": false,
     "collision_agent_fireball": true,
-    "agent_init_moving": true,
+    "agent_init_moving": false,
     "patient_init_moving": false,
     "fireball_init_moving": true,
     "ticks": 44
