@@ -56,6 +56,7 @@ def convert(rotate=False, path=""):
 		moves::list -- the moves the object has been assigned
 		'''
 		return moves.count('N')+moves.count('NS')+moves.count('NS2')+moves.count('S')
+	latent_movement_clips = ['med_push_latent_movement']
 	thetas = list(range(-19,-9))+list(range(10,19))
 	for idx in range(len(paths)):
 		for scene in experiment_clips[idx]:
@@ -71,7 +72,10 @@ def convert(rotate=False, path=""):
 			config['collision_agent_patient'] = bool(env.agent_patient_collision)
 			config['collision_agent_fireball'] = bool(env.agent_fireball_collision)
 			config['agent_init_moving'] = (count_nothing(env.agent.moves) != len(env.agent.moves))
-			config['patient_init_moving'] = (count_nothing(env.patient.moves) != len(env.patient.moves))
+			if scene in latent_movement_clips:
+				config['patient_init_moving'] = False
+			else:
+				config['patient_init_moving'] = (count_nothing(env.patient.moves) != len(env.patient.moves))
 			config['fireball_init_moving'] = (count_nothing(env.fireball.moves) != len(env.fireball.moves))
 			# Init dictionaries for body positions
 			bodies_dict = {}
